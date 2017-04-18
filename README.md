@@ -1,6 +1,6 @@
 # Úvodní informace
 
-Tento repozitář je určen pro testování HA RADIUS serverů cesnetu, které zajištují službu eduroam pro ČR.
+Účelem tohoto repozitáře je dokumentace pro testování HA RADIUS serverů cesnetu, které zajištují službu eduroam pro ČR.
 
 # Informace o serverech
 
@@ -21,6 +21,7 @@ Oba servery musí mít vzájemnou konektivitu.
 
 Pro souběžnou konfiguraci obou serverů je výhodné použít ssh multiplexor.
 Zle použít například *mssh* nebo *csshx*.
+Pokud není expliticně řečeno jinak, předpokládáme v jednotlivých krocích stejnou konfiguraci pro obou serverů.
 
 K oběma serverům se připojíme pomocí:
 ```
@@ -48,12 +49,31 @@ apt-get install -t jessie-backports pacemaker crmsh
 ```
 Tímto taktéž žávoreň nainstalujeme všechny potřebné závilosti.
 
-Dále instalujeme nginx, který bude sloužit jako indikátor dostupnosti služby.
+Dále instalujeme nginx, který bude sloužit jako indikátor dostupnosti služby:
 ```
 apt-get install nginx
 ```
 
+Je třeba zakázat automatické spuštění služby:
+```
+systemctl disable nginx
+```
 
+Taktéž zakážeme automatické sputění pacemakeru:
+```
+systemctl disable pacamaker
+```
+
+## Konfigurace clusteru
+
+Před samotnou konfigurací cluster je nejprve třeba konfigurovat corosync.
+
+Otevřeme soubor `/etc/corosync/corosync.conf` v našem oblíbeném textovém editoru
+a provedeme následující změny:
+  - změníme `crypto_cipher` parametr z `none` na `aes256`
+  - změníme `crypto_hash` z `none` na `aes256`
+  - změníme `bindnetaddr` na adresu TODO
+  -
 
 # Použité zdroje
   - [1](https://www.digitalocean.com/community/tutorials/how-to-create-a-high-availability-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04) https://www.digitalocean.com/community/tutorials/how-to-create-a-high-availability-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04
