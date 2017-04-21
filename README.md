@@ -79,8 +79,9 @@ a provedeme následující změny:
   - změníme `bindnetaddr` na adresu veřejnou adresu serveru:
     - 78.128.211.51 pro r1nren.et.cesnet.cz
     - 78.128.211.52 pro r2nren.et.cesnet.cz
-  - přidáme `two_node: 1` do quorum-bloku:
-  - přidáme `transport: udpu` do totem-bloku:
+  - zakomentujeme `mcastport`
+  - přidáme `two_node: 1` do quorum-bloku
+  - přidáme `transport: udpu` do totem-bloku
   - přidáme blok nodelist, kde staticky definujeme IP adresy serverů:
   ```
 nodelist {
@@ -118,6 +119,21 @@ Zkontrolujeme stav clusteru:
 crm status
 ```
 
+Očekávaný výstup:
+```
+Stack: corosync
+Current DC: r2nren.et.cesnet.cz (version 1.1.15-e174ec8) - partition with quorum
+Last updated: Fri Apr 21 20:59:36 2017      Last change: Fri Apr 21 20:58:55 2017 by hacluster via crmd on r2nren.et.cesnet.cz
+
+2 nodes and 0 resources configured
+
+Online: [ r1nren.et.cesnet.cz r2nren.et.cesnet.cz ]
+
+Full list of resources:
+
+```
+
+## Přidání zdrojů
 
 
 # Použité zdroje
