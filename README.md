@@ -61,7 +61,7 @@ systemctl disable nginx
 
 Taktéž zakážeme automatické sputění pacemakeru:
 ```
-systemctl disable pacamaker
+systemctl disable pacemaker
 ```
 
 ## Konfigurace clusteru
