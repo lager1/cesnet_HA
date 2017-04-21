@@ -64,6 +64,10 @@ Taktéž zakážeme automatické sputění pacemakeru:
 systemctl disable pacemaker
 ```
 
+TODO
+
+However keep in mind that you will have to execute service start pacemaker whenever you rebooted (one of) your nodes.
+
 ## Konfigurace clusteru
 
 Před samotnou konfigurací cluster je nejprve třeba konfigurovat corosync.
@@ -71,9 +75,50 @@ Před samotnou konfigurací cluster je nejprve třeba konfigurovat corosync.
 Otevřeme soubor `/etc/corosync/corosync.conf` v našem oblíbeném textovém editoru
 a provedeme následující změny:
   - změníme `crypto_cipher` parametr z `none` na `aes256`
-  - změníme `crypto_hash` z `none` na `aes256`
-  - změníme `bindnetaddr` na adresu TODO
-  -
+  - změníme `crypto_hash` z `none` na `sha256`
+  - změníme `bindnetaddr` na adresu veřejnou adresu serveru:
+    - 78.128.211.51 pro r1nren.et.cesnet.cz
+    - 78.128.211.52 pro r2nren.et.cesnet.cz
+  - přidáme `two_node: 1` do quorum-bloku:
+  - přidáme `transport: udpu` do totem-bloku:
+  - přidáme blok nodelist, kde staticky definujeme IP adresy serverů:
+  ```
+nodelist {
+        node {
+                ring0_addr: 78.128.211.51
+        }
+        node {
+                ring0_addr: 78.128.211.52
+        }
+}
+  ```
+
+Na r1nren.et.cesnet.cz dále spustťe:
+```
+corosync-keygen
+```
+
+Pro generování klíče je nutná dostatečná entropie. Pro generování entropie je možné příkazu dávat vstup z klávesnice.
+
+Vygenerovaný klíč se použije pro zabezpečení komunikace mezi oběma servery. Klíč zkopírujeme na druhý server:
+```
+scp /etc/corosync/authkey root@r2nren.et.cesnet.cz:/etc/corosync/authkey
+```
+
+## Spuštění clusteru
+
+Cluster je nakonfigurován, můžeme spustit corosync a pacemaker:
+```
+service corosync start
+service pacemaker start
+```
+
+Zkontrolujeme stav clusteru:
+```
+crm status
+```
+
+
 
 # Použité zdroje
   - [1](https://www.digitalocean.com/community/tutorials/how-to-create-a-high-availability-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04) https://www.digitalocean.com/community/tutorials/how-to-create-a-high-availability-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04
