@@ -20,7 +20,7 @@ Oba servery musí mít vzájemnou konektivitu.
 ## Příprava
 
 Pro souběžnou konfiguraci obou serverů je výhodné použít ssh multiplexor.
-Zle použít například *mssh* nebo *csshx*.
+Lze použít například *mssh* nebo *csshx*.
 Pokud není expliticně řečeno jinak, předpokládáme v jednotlivých krocích stejnou konfiguraci obou serverů.
 
 K oběma serverům se připojíme pomocí:
