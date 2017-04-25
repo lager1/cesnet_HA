@@ -1,6 +1,6 @@
 # Úvodní informace
 
-Účelem tohoto repozitáře je dokumentace pro testování HA RADIUS serverů cesnetu, které zajištují službu eduroam pro ČR.
+Účelem tohoto repozitáře je dokumentace pro testování HA RADIUS serverů CESNETu, které zajištují službu eduroam pro ČR.
 
 # Informace o serverech
 
