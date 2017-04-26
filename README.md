@@ -6,7 +6,7 @@
 
 - server1: r1nren.et.cesnet.cz, 78.128.211.51
 - server2: r2nren.et.cesnet.cz, 78.128.211.52
-- standby ip: nren.et.cesnet.cz, 78.128.211.53
+- standby IP: nren.et.cesnet.cz, 78.128.211.53
 
 Stroje budou zapojeny v režimu aktivní + standby.
 Jako operační systém obou serverů byl zvolen debian Jessie.
@@ -217,6 +217,41 @@ Očekávaný výstup:
 ## Přidání zdrojů
 
 Cluster je spusťen, takže můžeme přidávat zdroje. Zdroje budou mít následující jména:
+- *standby_ip* - standby IP adresa
+- *nginx* - webový server
+- *fence_r1nren* - fencing-agent pro r1nren.et.cesnet.cz běžící na r2nren.et.cesnet.cz
+- *fence_r2nren* - fencing-agent pro r2nren.et.cesnet.cz běžící na r1nren.et.cesnet.cz
+
+### Nginx a standby IP
+
+Spustíme crm shell:
+```
+crm configure
+```
+
+Vložíme následující příkazy:
+```
+property stonith-enabled=no
+property no-quorum-policy=ignore
+property default-resource-stickiness=100
+```
+
+Příkaz *no-quorum-policy=ignore* je důležitý, aby mohl cluster nadále bežet i v případě, že bude aktivní pouze jeden server.
+
+Nyní přidáme vlastní zdroje:
+```
+primitive standby_ip ocf:heartbeat:IPaddr2 \
+        params ip="78.128.211.53" nic="eth1" cidr_netmask="24" \
+        meta migration-threshold=2 \
+        op monitor interval=20 timeout=60 on-fail=restart
+primitive nginx ocf:heartbeat:nginx \
+        meta migration-threshold=2 \
+        op monitor interval=20 timeout=60 on-fail=restart
+colocation lb-loc inf: standby_ip nginx
+order lb-ord inf: standby_ip nginx
+commit
+```
+
 
 
 # Použité zdroje
