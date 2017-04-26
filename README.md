@@ -15,7 +15,7 @@ Jako operační systém obou serverů byl zvolen debian Jessie.
 
 ## Prerekvizity
 
-Oba servery musí mít vzájemnou konektivitu.
+Oba servery musí mít vzájemnou konektivitu. Taktéž je vhodné, aby měly oba servery vzájemně stejný čas, ideálně jednotný dle ntp.
 
 ## Příprava
 
