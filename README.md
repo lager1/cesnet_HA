@@ -216,7 +216,9 @@ Cluster je spusťen, takže můžeme přidávat zdroje. Zdroje budou mít násle
 - *fence_r1nren* - fencing-agent pro r1nren.et.cesnet.cz běžící na r2nren.et.cesnet.cz
 - *fence_r2nren* - fencing-agent pro r2nren.et.cesnet.cz běžící na r1nren.et.cesnet.cz
 
-### Nginx a standby IP
+### standby IP
+
+Tuto část konfigurace budeme provádět pouze na jednom serveru. Konfigurace bude automaticky distribuována na oba uzly.
 
 Spustíme crm shell:
 ```
@@ -240,8 +242,51 @@ primitive standby_ip ocf:heartbeat:IPaddr2 \
         op monitor interval=20 timeout=60 on-fail=restart
 colocation lb-loc inf: standby_ip
 order lb-ord inf: standby_ip
+location prefer-r1 standby_ip 50: r1nren.et.cesnet.cz
 commit
 ```
+
+Ověrímě, že vše proběhlo bez chyby:
+```
+show
+```
+
+Očekávaný výstup:
+```
+node 1317065523: r1nren.et.cesnet.cz
+node 1317065524: r2nren.et.cesnet.cz
+primitive standby_ip IPaddr2 \
+	params ip=78.128.211.53 nic=eth0 cidr_netmask=24 \
+	meta migration-threshold=2 \
+	op monitor interval=20 timeout=60 on-fail=restart
+xml <rsc_colocation id="lb-loc" score="INFINITY"> \
+  <resource_set id="lb-loc-0"> \
+    <resource_ref id="standby_ip"/> \
+  </resource_set> \
+</rsc_colocation>
+xml <rsc_order id="lb-ord" score="INFINITY"> \
+  <resource_set id="lb-ord-0"> \
+    <resource_ref id="standby_ip"/> \
+  </resource_set> \
+</rsc_order>
+location prefer-r1 standby_ip 50: r1nren.et.cesnet.cz
+property cib-bootstrap-options: \
+	have-watchdog=false \
+	dc-version=1.1.15-e174ec8 \
+	cluster-infrastructure=corosync \
+	cluster-name=debian \
+	stonith-enabled=no \
+	no-quorum-policy=ignore \
+	default-resource-stickiness=100
+```
+
+### fencing agenti
+
+
+```
+
+```
+
 
 
 
@@ -253,6 +298,8 @@ commit
   - [5](https://vexxhost.com/resources/tutorials/how-to-create-a-high-availability-haproxy-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04/) https://vexxhost.com/resources/tutorials/how-to-create-a-high-availability-haproxy-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04/
   - [6](http://blog.non-a.net/2011/03/27/cluster_drbd) http://blog.non-a.net/2011/03/27/cluster_drbd
   - [7](https://www.theurbanpenguin.com/drbd-pacemaker-ha-cluster-ubuntu-16-04/) https://www.theurbanpenguin.com/drbd-pacemaker-ha-cluster-ubuntu-16-04/
+
+
 
 
 
