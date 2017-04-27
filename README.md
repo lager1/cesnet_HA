@@ -213,8 +213,6 @@ Očekávaný výstup:
 
 Cluster je spusťen, takže můžeme přidávat zdroje. Zdroje budou mít následující jména:
 - *standby_ip* - standby IP adresa
-- *fence_r1nren* - fencing-agent pro r1nren.et.cesnet.cz běžící na r2nren.et.cesnet.cz
-- *fence_r2nren* - fencing-agent pro r2nren.et.cesnet.cz běžící na r1nren.et.cesnet.cz
 
 ### standby IP
 
@@ -280,13 +278,24 @@ property cib-bootstrap-options: \
 	default-resource-stickiness=100
 ```
 
-### fencing agenti
+# Simulace výpadku
 
+Ověříme, že migrace adresy funguje správce simulací výpadku r1nren.et.cesnet.cz.
 
+Výpadek stroje na 60 sekund můžeme simulovat například pomocí iptables:
+```
+iptables -P INPUT DROP ; sleep 60 ; iptables -P INPUT ACCEPT;
 ```
 
+V dalším terminálu můžeme spustit ping na adresu nren.et.cesnet.cz:
+```
+ping nren.et.cesnet.cz
 ```
 
+Po spuštění simulace výpadku přestane adresa na několik sekund odpovídat.
+Potom, co cluster detekuje tento stav přemigruje adresu na r2nren.et.cesnet.cz.
+Dostupnost adresy lze taktéž alternativně ověřit dotazem na adresu nren.et.cesnet.cz ve webovém prohlížeči.
+Obsahem zobrazené stránky je jméno serveru, který ji poskytl.
 
 
 
