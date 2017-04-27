@@ -282,9 +282,9 @@ property cib-bootstrap-options: \
 
 Ověříme, že migrace adresy funguje správce simulací výpadku r1nren.et.cesnet.cz.
 
-Výpadek stroje na 60 sekund můžeme simulovat například pomocí iptables:
+Výpadek serveru na 60 sekund můžeme simulovat například takto:
 ```
-iptables -P INPUT DROP ; sleep 60 ; iptables -P INPUT ACCEPT;
+service pacemaker stop; service corosync stop; sleep 60; service pacemaker start; service corosync start;
 ```
 
 V dalším terminálu můžeme spustit ping na adresu nren.et.cesnet.cz:
@@ -307,6 +307,7 @@ Obsahem zobrazené stránky je jméno serveru, který ji poskytl.
   - [5](https://vexxhost.com/resources/tutorials/how-to-create-a-high-availability-haproxy-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04/) https://vexxhost.com/resources/tutorials/how-to-create-a-high-availability-haproxy-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04/
   - [6](http://blog.non-a.net/2011/03/27/cluster_drbd) http://blog.non-a.net/2011/03/27/cluster_drbd
   - [7](https://www.theurbanpenguin.com/drbd-pacemaker-ha-cluster-ubuntu-16-04/) https://www.theurbanpenguin.com/drbd-pacemaker-ha-cluster-ubuntu-16-04/
+  - [8](http://clusterlabs.org/doc/en-US/Pacemaker/1.1-plugin/html/Clusters_from_Scratch/_prevent_resources_from_moving_after_recovery.html) http://clusterlabs.org/doc/en-US/Pacemaker/1.1-plugin/html/Clusters_from_Scratch/_prevent_resources_from_moving_after_recovery.html
 
 
 
