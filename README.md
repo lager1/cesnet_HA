@@ -54,15 +54,6 @@ Dále instalujeme nginx, který bude sloužit jako indikátor dostupnosti služb
 apt-get install nginx
 ```
 
-Taktéž zakážeme automatické sputění pacemakeru:
-```
-systemctl disable pacemaker
-```
-
-TODO
-
-However keep in mind that you will have to execute service start pacemaker whenever you rebooted (one of) your nodes.
-
 ## Konfigurace clusteru
 
 Před samotnou konfigurací cluster je nejprve třeba konfigurovat corosync.
