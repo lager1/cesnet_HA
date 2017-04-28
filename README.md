@@ -204,6 +204,9 @@ Očekávaný výstup:
 
 Cluster je spusťen, takže můžeme přidávat zdroje. Zdroje budou mít následující jména:
 - *standby_ip* - standby IP adresa
+- *nginx* - webový server
+- *fence_ssh* - ssh fencing-agent
+
 
 ### standby IP
 
@@ -229,9 +232,13 @@ primitive standby_ip ocf:heartbeat:IPaddr2 \
         params ip="78.128.211.53" nic="eth0" cidr_netmask="24" \
         meta migration-threshold=2 \
         op monitor interval=20 timeout=60 on-fail=restart
-colocation lb-loc inf: standby_ip
-order lb-ord inf: standby_ip
-location prefer-r1 standby_ip 50: r1nren.et.cesnet.cz
+primitive nginx ocf:heartbeat:nginx \
+        meta migration-threshold=2 \
+        op monitor interval=20 timeout=60 on-fail=restart
+colocation loc inf: standby_ip nginx
+order ord inf: standby_ip nginx
+location ip_pref standby_ip 50: r1nren.et.cesnet.cz
+location nginx_pref nginx 50: r1nren.et.cesnet.cz
 commit
 ```
 
@@ -244,21 +251,17 @@ Očekávaný výstup:
 ```
 node 1317065523: r1nren.et.cesnet.cz
 node 1317065524: r2nren.et.cesnet.cz
+primitive nginx nginx \
+	meta migration-threshold=2 \
+	op monitor interval=20 timeout=60 on-fail=restart
 primitive standby_ip IPaddr2 \
 	params ip=78.128.211.53 nic=eth0 cidr_netmask=24 \
 	meta migration-threshold=2 \
 	op monitor interval=20 timeout=60 on-fail=restart
-xml <rsc_colocation id="lb-loc" score="INFINITY"> \
-  <resource_set id="lb-loc-0"> \
-    <resource_ref id="standby_ip"/> \
-  </resource_set> \
-</rsc_colocation>
-xml <rsc_order id="lb-ord" score="INFINITY"> \
-  <resource_set id="lb-ord-0"> \
-    <resource_ref id="standby_ip"/> \
-  </resource_set> \
-</rsc_order>
-location prefer-r1 standby_ip 50: r1nren.et.cesnet.cz
+location ip_pref standby_ip 50: r1nren.et.cesnet.cz
+colocation loc inf: standby_ip nginx
+location nginx_pref nginx 50: r1nren.et.cesnet.cz
+order ord inf: standby_ip nginx
 property cib-bootstrap-options: \
 	have-watchdog=false \
 	dc-version=1.1.15-e174ec8 \
@@ -267,6 +270,32 @@ property cib-bootstrap-options: \
 	stonith-enabled=no \
 	no-quorum-policy=ignore \
 	default-resource-stickiness=100
+```
+
+### fending-agent
+
+Fencing-agent zajistí clusteru vždy nějaký definovaný stav.
+Taktéž je schopnem nám v tomto konkrétním případě zajistit výlučný přístup ke zdrojům.
+
+
+Vložíme následující příkazy:
+```
+property stonith-enabled=yes
+primitive fence_ssh stonith:external/ssh \
+    params hostlist="r1nren.et.cesnet.cz r2nren.et.cesnet.cz" \
+    op monitor interval=60s
+commit
+```
+
+Na obou serverech je následně potřeba provést následující příkazy:
+```
+ssh-keygen -t rsa -b 4096
+```
+
+Vygenerované klíče následně vzájemně přeneseme:
+```
+ssh-copy-id -i .ssh/id_rsa.pub root@r1nren.et.cesnet.cz
+ssh-copy-id -i .ssh/id_rsa.pub root@r2nren.et.cesnet.cz
 ```
 
 # Simulace výpadku
