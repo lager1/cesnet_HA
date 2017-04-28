@@ -272,7 +272,7 @@ property cib-bootstrap-options: \
 	default-resource-stickiness=100
 ```
 
-### fending-agent
+### fencing-agent
 
 Fencing-agent zajistí clusteru vždy nějaký definovaný stav.
 Taktéž je schopnem nám v tomto konkrétním případě zajistit výlučný přístup ke zdrojům.
