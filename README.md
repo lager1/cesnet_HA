@@ -205,7 +205,6 @@ Očekávaný výstup:
 Cluster je spusťen, takže můžeme přidávat zdroje. Zdroje budou mít následující jména:
 - *standby_ip* - standby IP adresa
 - *nginx* - webový server
-- *fence_ssh* - ssh fencing-agent
 
 
 ### standby IP
@@ -230,11 +229,11 @@ Nyní přidáme vlastní zdroje:
 ```
 primitive standby_ip ocf:heartbeat:IPaddr2 \
         params ip="78.128.211.53" nic="eth0" cidr_netmask="24" \
-        meta migration-threshold=2 \
-        op monitor interval=20 timeout=60 on-fail=restart
+        meta migration-threshold=1 failure-timeout=300s \
+        op monitor interval=60 timeout=300 on-fail=restart
 primitive nginx ocf:heartbeat:nginx \
-        meta migration-threshold=2 \
-        op monitor interval=20 timeout=60 on-fail=restart
+        meta migration-threshold=1 failure-timeout=300s \
+        op monitor interval=60 timeout=300 on-fail=restart
 colocation loc inf: standby_ip nginx
 order ord inf: standby_ip nginx
 location ip_pref standby_ip 50: r1nren.et.cesnet.cz
@@ -252,12 +251,12 @@ Očekávaný výstup:
 node 1317065523: r1nren.et.cesnet.cz
 node 1317065524: r2nren.et.cesnet.cz
 primitive nginx nginx \
-	meta migration-threshold=2 \
-	op monitor interval=20 timeout=60 on-fail=restart
+	meta migration-threshold=1 failure-timeout=300s \
+	op monitor interval=60 timeout=300 on-fail=restart
 primitive standby_ip IPaddr2 \
 	params ip=78.128.211.53 nic=eth0 cidr_netmask=24 \
-	meta migration-threshold=2 \
-	op monitor interval=20 timeout=60 on-fail=restart
+	meta migration-threshold=1 failure-timeout=300s \
+	op monitor interval=60 timeout=300 on-fail=restart
 location ip_pref standby_ip 50: r1nren.et.cesnet.cz
 colocation loc inf: standby_ip nginx
 location nginx_pref nginx 50: r1nren.et.cesnet.cz
@@ -270,32 +269,6 @@ property cib-bootstrap-options: \
 	stonith-enabled=no \
 	no-quorum-policy=ignore \
 	default-resource-stickiness=100
-```
-
-### fencing-agent
-
-Fencing-agent zajistí clusteru vždy nějaký definovaný stav.
-Taktéž je schopnem nám v tomto konkrétním případě zajistit výlučný přístup ke zdrojům.
-
-
-Vložíme následující příkazy:
-```
-property stonith-enabled=yes
-primitive fence_ssh stonith:external/ssh \
-    params hostlist="r1nren.et.cesnet.cz r2nren.et.cesnet.cz" \
-    op monitor interval=60s
-commit
-```
-
-Na obou serverech je následně potřeba provést následující příkazy:
-```
-ssh-keygen -t rsa -b 4096
-```
-
-Vygenerované klíče následně vzájemně přeneseme:
-```
-ssh-copy-id -i .ssh/id_rsa.pub root@r1nren.et.cesnet.cz
-ssh-copy-id -i .ssh/id_rsa.pub root@r2nren.et.cesnet.cz
 ```
 
 ### Vysvětlivky ke konfiguraci
@@ -326,6 +299,12 @@ Výpadek serveru na 60 sekund můžeme simulovat například takto:
 service pacemaker stop; service corosync stop; sleep 60; service pacemaker start; service corosync start;
 ```
 
+Případně je možné použít alternativu:
+```
+iptables -P INPUT DROP ; sleep 60 ; iptables -P INPUT ACCEPT;
+```
+
+
 V dalším terminálu můžeme spustit ping na adresu nren.et.cesnet.cz:
 ```
 ping nren.et.cesnet.cz
@@ -351,6 +330,7 @@ Obsahem zobrazené stránky je jméno serveru, který ji poskytl.
   - [10](http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-ordering.html) http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-ordering.html
   - [11](http://clusterlabs.org/doc/Colocation_Explained.pdf) http://clusterlabs.org/doc/Colocation_Explained.pdf
   - [12](http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-colocation.html) http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-colocation.html
+  - [13](http://clusterlabs.org/doc/en-US/Pacemaker/1.0/html/Pacemaker_Explained/s-resource-operations.html) http://clusterlabs.org/doc/en-US/Pacemaker/1.0/html/Pacemaker_Explained/s-resource-operations.html
 
 
 
