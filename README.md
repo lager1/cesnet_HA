@@ -298,6 +298,25 @@ ssh-copy-id -i .ssh/id_rsa.pub root@r1nren.et.cesnet.cz
 ssh-copy-id -i .ssh/id_rsa.pub root@r2nren.et.cesnet.cz
 ```
 
+### Vysvětlivky ke konfiguraci
+
+#### Závislosti
+
+Mezi jednotlivými konfigurovanými primitivy je možné definovat závislosti.
+Závislosti definujeme pomocí direktivy `order`, například:
+```
+order o_foo_before_bar inf: foo bar
+```
+
+Definice závislostí může být povinná (mandatory) nebo doporučená (advisory).
+Zavislosti sami nijak nedefinují to, kde mají být konkrétní primitiva v rámci clusteru umísťena.
+
+
+#### Závislost umístění
+
+Pro specifikaci závislosti umísťení v rámci clusteru se používá direktiva `colocation`.
+
+
 # Simulace výpadku
 
 Ověříme, že migrace adresy funguje správce simulací výpadku r1nren.et.cesnet.cz.
@@ -328,6 +347,10 @@ Obsahem zobrazené stránky je jméno serveru, který ji poskytl.
   - [6](http://blog.non-a.net/2011/03/27/cluster_drbd) http://blog.non-a.net/2011/03/27/cluster_drbd
   - [7](https://www.theurbanpenguin.com/drbd-pacemaker-ha-cluster-ubuntu-16-04/) https://www.theurbanpenguin.com/drbd-pacemaker-ha-cluster-ubuntu-16-04/
   - [8](http://clusterlabs.org/doc/en-US/Pacemaker/1.1-plugin/html/Clusters_from_Scratch/_prevent_resources_from_moving_after_recovery.html) http://clusterlabs.org/doc/en-US/Pacemaker/1.1-plugin/html/Clusters_from_Scratch/_prevent_resources_from_moving_after_recovery.html
+  - [9](https://www.hastexo.com/resources/hints-and-kinks/mandatory-and-advisory-ordering-pacemaker/) https://www.hastexo.com/resources/hints-and-kinks/mandatory-and-advisory-ordering-pacemaker/
+  - [10](http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-ordering.html) http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-ordering.html
+  - [11](http://clusterlabs.org/doc/Colocation_Explained.pdf) http://clusterlabs.org/doc/Colocation_Explained.pdf
+  - [12](http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-colocation.html) http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-colocation.html
 
 
 
