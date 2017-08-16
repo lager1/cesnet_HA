@@ -9,7 +9,7 @@
 - standby IP: nren.et.cesnet.cz, 78.128.211.53
 
 Stroje budou zapojeny v režimu aktivní + standby.
-Jako operační systém obou serverů byl zvolen debian Jessie.
+Jako operační systém obou serverů byl zvolen debian Stretch.
 
 # Konfigurace strojů
 
