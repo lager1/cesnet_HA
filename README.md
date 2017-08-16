@@ -28,32 +28,6 @@ K oběma serverům se připojíme pomocí:
 mssh root@r1nren.et.cesnet.cz root@r2nren.et.cesnet.cz
 ```  
 
-## Konfigurace prostředí
-
-Podle použitých zdrojů nejsou ve verzi jessie dostupné balíky pro tvorbu clusteru.
-Přidáme tedy repozitáře jessie-backports:
-```
-cat > /etc/apt/sources.list.d/jessie-backports.list << "EOF"
-deb http://http.debian.net/debian jessie-backports main
-EOF
-```
-
-Obnovíme seznam zdrojů:
-```
-apt-get update
-```
-
-Nainstalujeme podpůrné balíky z repozitáře jessie-backports:
-```
-apt-get install -t jessie-backports pacemaker crmsh
-```
-Tímto taktéž žávoreň nainstalujeme všechny potřebné závilosti.
-
-Dále instalujeme nginx, který bude sloužit jako indikátor dostupnosti služby:
-```
-apt-get install nginx
-```
-
 ## Konfigurace clusteru
 
 Před samotnou konfigurací cluster je nejprve třeba konfigurovat corosync.
