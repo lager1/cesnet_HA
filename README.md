@@ -4,14 +4,20 @@
 
 # Informace o serverech
 
-- server1: r1nren.et.cesnet.cz, 78.128.211.51
-- server2: r2nren.et.cesnet.cz, 78.128.211.52
-- standby IP: nren.et.cesnet.cz, 78.128.211.53
+toplevel:
+  - server1: r1nren.et.cesnet.cz, 78.128.211.51
+  - server2: r2nren.et.cesnet.cz, 78.128.211.52
+  - standby IP: nren.et.cesnet.cz, 78.128.211.53
+
+"organizace":
+  - server1: org1.et.cesnet.cz, 78.128.211.72
+  - server2: org2.et.cesnet.cz, 78.128.211.73
+
 
 Stroje budou zapojeny v režimu aktivní + standby.
-Jako operační systém obou serverů byl zvolen debian Stretch.
+Jako operační systém všech serverů byl zvolen debian Stretch.
 
-# Konfigurace strojů
+# Konfigurace toplevel strojů
 
 ## Prerekvizity
 
