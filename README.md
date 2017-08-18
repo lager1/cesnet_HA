@@ -313,6 +313,16 @@ Obsahem zobrazené stránky je jméno serveru, který ji poskytl.
   - [13](http://clusterlabs.org/doc/en-US/Pacemaker/1.0/html/Pacemaker_Explained/s-resource-operations.html) http://clusterlabs.org/doc/en-US/Pacemaker/1.0/html/Pacemaker_Explained/s-resource-operations.html
 
 
+# Dodatečné zdroje - ansible
+  - https://docs.ansible.com/ansible/pacemaker_cluster_module.html
+  - https://github.com/styopa/ansible-pacemaker
+  - https://github.com/sbitio/ansible-pacemaker
+  - https://github.com/OndrejHome/ansible.ha-cluster-pacemaker
+  - https://github.com/leucos/ansible-pacemaker-corosync
+  - https://github.com/mrlesmithjr/ansible-pacemaker
+  - https://github.com/redhat-openstack/ansible-pacemaker
+  - https://github.com/sbitio/ansible-corosync
+
 
 
 
