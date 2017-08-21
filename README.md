@@ -10,8 +10,8 @@ toplevel:
   - standby IP: nren.et.cesnet.cz, 78.128.211.53
 
 "organizace":
-  - server1: org1.et.cesnet.cz, 78.128.211.72
-  - server2: org2.et.cesnet.cz, 78.128.211.73
+  - server1: org1.et.cesnet.cz, 78.128.211.72, RadSec, realm1.cz
+  - server2: org2.et.cesnet.cz, 78.128.211.73, IPsec, realm2.cz
 
 
 Stroje budou zapojeny v režimu aktivní + standby.
