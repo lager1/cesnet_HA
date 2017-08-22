@@ -34,6 +34,13 @@ K oběma serverům se připojíme pomocí:
 mssh root@r1nren.et.cesnet.cz root@r2nren.et.cesnet.cz
 ```  
 
+## Instalace potřebného sw
+Nainstalujeme podpůrné balíky:
+```
+apt-get install pacemaker crmsh corosync pacemaker-cli-utils pacemaker-resource-agents pacemaker-common
+```
+
+
 ## Konfigurace clusteru
 
 Před samotnou konfigurací cluster je nejprve třeba konfigurovat corosync.
