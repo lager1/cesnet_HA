@@ -1,0 +1,52 @@
+totem {
+	version: 2
+	transport: {{ corosync_transport_proto }}
+	cluster_name: {{ corosync_cluster_name }}
+	token: 3000
+	token_retransmits_before_loss_const: 10
+	clear_node_high_bit: yes
+	crypto_cipher: {{ corosync_crypto_cipher }}
+	crypto_hash: {{ corosync_crypto_hash }}
+	interface {
+		ringnumber: 0
+		bindnetaddr: {{ node_ip_addr }}
+		ttl: 1
+	}
+
+logging {
+	fileline: off
+	to_stderr: no
+	to_logfile: no
+	to_syslog: yes
+	syslog_facility: daemon
+	debug: off
+	timestamp: on
+	logger_subsys {
+		subsys: QUORUM
+		debug: off
+	}
+}
+
+quorum {
+	provider: corosync_votequorum
+	expected_votes: {{ corosync_expected_votes }}
+{% if corosync_wait_for_all is defined and corosync_wait_for_all %}
+	wait_for_all: 1
+{% endif %}
+{% if corosync_last_man_standing is defined and corosync_last_man_standing %}
+	last_man_standing: 1
+{% endif %}
+{% if corosync_two_node is defined and corosync_two_node %}
+	two_node: 1
+{% endif %}
+}
+
+nodelist{
+{% for host in groups['all'] %}
+		node {
+			ring0_addr: {{ hostvars[host]['inventory_hostname'] }}
+			ring0_addr: {{ hostvars[host].node_ip_addr }}
+		}
+{% endfor %}
+	}
+}

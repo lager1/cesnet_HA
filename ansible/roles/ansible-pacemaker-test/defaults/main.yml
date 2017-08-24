@@ -1,0 +1,35 @@
+master_server: 'r1nren.et.cesnet.cz'
+#corosync_authkey_file: '/etc/corosync/authkey'	# TODO
+corosync_authkey_file: '/tmp/test'
+corosync_bindnet_interface: 'eth0'
+corosync_config_file: '/etc/corosync/corosync.conf'
+corosync_expected_votes: 2
+corosync_cluster_name: 'debian'
+corosync_last_man_standing: true
+corosync_transport_proto: 'udpu'
+corosync_crypto_cipher: 'aes256'
+corosync_crypto_hash: 'aes256'
+corosync_wait_for_all: true
+corosync_two_node: true
+pacemaker_disable_stonith: true
+pacemaker_hacluster_password: '64ce38bafdfbb4d6eafa5e40aafbe5a62f73741f01d8770e9fa81aa97fce2d190ef0b57336927a34c12e42ef7505129cbd40a0242dacd560a3754f0f8888074b'
+
+pacemaker_cluster_resources:
+   - resource_id: 'standby_ip'
+     action: 'create'
+     provider: 'ocf:heartbeat:IPaddr2'
+     options:
+       - 'ip=192.168.250.200'
+       - 'cidr_netmask=24'
+     op: 'monitor'
+     op_options:
+       - 'interval=30s'
+   - resource_id: 'webserver'
+     action: 'create'
+     provider: 'ocf:heartbeat:nginx'
+     options:
+       - 'configfile=/etc/nginx/nginx.conf'
+     op: 'monitor'
+     op_options:
+       - 'timeout=5s'
+       - 'interval=5s'

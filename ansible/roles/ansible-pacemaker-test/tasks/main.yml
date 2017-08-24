@@ -1,0 +1,6 @@
+---
+- include_vars: "host_vars/{{ inventory_hostname }}.yml"	# toto by se melo dit automaticky - zkontrolovat
+- include: install.yml
+- include: corosync.yml
+- include: pacemaker.yml
+#- include: services.yml

@@ -1,0 +1,44 @@
+- debug: msg="{{ hostvars[inventory_hostname]['node_ip_addr'] }}"
+
+- name: configure corosync
+  template:
+    src: "etc/corosync/corosync.conf.j2"
+    #dest: "{{ corosync_config_file }}"
+    dest: /tmp/ansible.all	# TODO
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  register: "_corosync_reconfigured"
+
+- name: check if {{ corosync_authkey_file }} exists
+  stat:
+    path: "{{ corosync_authkey_file }}"
+  register: "_corosync_authkey"
+# pridat podminky pro toho, kdo je master
+# limit na mastera, aby slave servery pockali
+
+
+#- name: generate corosync authkey on master server - {{ master_server }}
+#  command: corosync-keygen
+#  register: "_corosync_auth_key_generated"
+#  when: >		# TODO - co je tohle za syntaxi?
+#    not _corosync_authkey['stat']['exists'] and
+#    (inventory_hostname == master_server)
+
+## TODO - copy na ostatni stroje
+#- name: copy corosync authkey to all servers
+#  synchronize:
+#    src: "{{ corosync_authkey_file }}"
+#    dest: "rsync://{{ hostname }}/{{ corosync_authkey_file }}"
+#    with_items: groups['all']
+#    loop_control:
+#      loop_var: hostname
+#  when: inventory_hostname == master_server
+#  #notify:	# TODO
+#  #  - restart corosync
+#  #  - restart pacemaker
+
+
+# na tohle se vykaslat udelat lokalni fetch a nasledne to nacpat na ostatni
+
+
