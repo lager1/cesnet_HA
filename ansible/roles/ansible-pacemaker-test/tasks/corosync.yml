@@ -1,5 +1,3 @@
-# TODO - cele pustit na cisto
-
 - name: configure corosync
   template:
     src: "etc/corosync/corosync.conf.j2"
@@ -7,96 +5,42 @@
     owner: "root"
     group: "root"
     mode: "u=rw,g=r,o=r"
+  notify:
+    - restart corosync
+    - restart pacemaker
 
-- name: check if {{ corosync_authkey_file }} exists on master
+- name: check if {{ corosync_authkey_file }} exists
   stat:
     path: "{{ corosync_authkey_file }}"
-  when: inventory_hostname == master_server
-  register: "_corosync_authkey_master"
+  register: "_corosync_authkey"
 
-#- name: check if {{ corosync_authkey_file }} exists
-#  stat:
-#    path: "{{ corosync_authkey_file }}"
-#  register: "_corosync_authkey_master"
+- name: generate corosync authkey on master server - {{ master_server }}
+  command: corosync-keygen -k {{ corosync_authkey_file }}
+  when: (inventory_hostname == master_server) and
+        (not _corosync_authkey['stat']['exists'])
+  register: "_corosync_authkey_generated"
 
-# takhle by se to melo delat spravne?
-- name: set fact for corosync_authkey_file
-  set_fact:
-    fact_corosync_authkey: "{{ _corosync_authkey_master }}"
+- name: copy corosync authkey to local machine
+  fetch:
+    flat: yes
+    src: "{{ corosync_authkey_file }}"
+    dest: "/tmp/authkey"
+  when: (inventory_hostname == master_server) and
+        (_corosync_authkey_generated.changed)
 
-- name: debug
-  debug:
-    var: fact_corosync_authkey
+- name: copy corosync authkey to slave server
+  copy:
+    src: "/tmp/authkey"
+    dest: "{{ corosync_authkey_file }}"
+  when: (inventory_hostname != master_server) and
+        (not _corosync_authkey['stat']['exists'])
 
-
-## TODO - pokud by bylo pouzito > 2 servery, 
-## tento task by musel byt prepsan?
-#- name: check if {{ corosync_authkey_file }} exists on slave
-#  stat:
-#    path: "{{ corosync_authkey_file }}"
-#  when: (inventory_hostname != master_server)
-#  register: "_corosync_authkey_slave"
-#
-#- name: generate corosync authkey on master server - {{ master_server }}
-#  command: corosync-keygen -k {{ corosync_authkey_file }}
-#  when: (inventory_hostname == master_server) and
-#        (not _corosync_authkey_master['stat']['exists'])
-#  register: "_corosync_auth_key_generated"
-
-# ===============================================================
-
-##- name: read corosync authkey file
-##  when: (inventory_hostname == master_server) and
-##       (_corosync_auth_key_generated.changed)
-##  vars:
-##     _corosync_authkey: "{{ lookup('file', {{ corosync_authkey_file }}) }}"
-#
-#- name: configure auth key on slave server
-#  template:
-#    src: "etc/corosync/authkey.j2"
-#    dest: "{{ corosync_authkey_file }}"
-#    owner: "root"
-#    group: "root"
-#    mode: "u=r,g=,o="
-#  when: (inventory_hostname != master_server) and
-#        (not _corosync_authkey_slave['stat']['exists'])
-#  vars:
-#     _corosync_authkey: "{{ lookup('file', '' + corosync_authkey_file|quote ) }}"
-
-# ===============================================================
-
-
-
-## TODO - udelat jako zavislost tasku pro generovani
-#- name: copy corosync authkey to local machine
-#  fetch:
-#    flat: yes
-#    src: "{{ corosync_authkey_file }}"
-#    dest: "/tmp/authkey"
-#  when: (inventory_hostname == master_server) and
-#        (_corosync_auth_key_generated.changed or _corosync_authkey_master['stat']['exists'])
-#        
-### spravna varianta casti podminky
-##(_corosync_auth_key_generated.changed or not _corosync_authkey_slave['stat']['exists'])
-#
-## TODO - udelat jako zavislost tasku pro generovani
-#- name: copy corosync authkey to slave server
-#  copy:
-#    src: "/tmp/authkey"
-#    dest: "{{ corosync_authkey_file }}"
-#  when: (inventory_hostname != master_server) and
-#        (not _corosync_authkey_slave['stat']['exists'])
-#
-## TODO - udelat jako zavislost tasku pro generovani
-#- name: remove corosync authkey
-#  file:
-#    absent: true
-#  when: (inventory_hostname == master_server)
-#  delegate_to: 127.0.0.1
-
-
-  #notify:	# TODO
-  #  - restart corosync
-  #  - restart pacemaker
+- name: remove corosync authkey
+  file:
+    path: "/tmp/authkey"
+    state: absent
+  when: (inventory_hostname == master_server) and
+        (_corosync_authkey_generated.changed)
+  delegate_to: 127.0.0.1
 
 
