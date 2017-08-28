@@ -12,6 +12,7 @@ totem {
 		bindnetaddr: {{ node_ip_addr }}
 		ttl: 1
 	}
+}
 
 logging {
 	fileline: off
@@ -47,5 +48,4 @@ nodelist{
 			ring0_addr: {{ hostvars[host].node_ip_addr }}
 		}
 {% endfor %}
-	}
 }
