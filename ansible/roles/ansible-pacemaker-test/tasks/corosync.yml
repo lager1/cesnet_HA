@@ -1,44 +1,102 @@
-- debug: msg="{{ hostvars[inventory_hostname]['node_ip_addr'] }}"
+# TODO - cele pustit na cisto
 
 - name: configure corosync
   template:
     src: "etc/corosync/corosync.conf.j2"
-    #dest: "{{ corosync_config_file }}"
-    dest: /tmp/ansible.all	# TODO
+    dest: "{{ corosync_config_file }}"
     owner: "root"
     group: "root"
     mode: "u=rw,g=r,o=r"
-  register: "_corosync_reconfigured"
 
-- name: check if {{ corosync_authkey_file }} exists
+- name: check if {{ corosync_authkey_file }} exists on master
   stat:
     path: "{{ corosync_authkey_file }}"
-  register: "_corosync_authkey"
-# pridat podminky pro toho, kdo je master
-# limit na mastera, aby slave servery pockali
+  when: inventory_hostname == master_server
+  register: "_corosync_authkey_master"
+
+#- name: check if {{ corosync_authkey_file }} exists
+#  stat:
+#    path: "{{ corosync_authkey_file }}"
+#  register: "_corosync_authkey_master"
+
+# takhle by se to melo delat spravne?
+- name: set fact for corosync_authkey_file
+  set_fact:
+    fact_corosync_authkey: "{{ _corosync_authkey_master }}"
+
+- name: debug
+  debug:
+    var: fact_corosync_authkey
 
 
+## TODO - pokud by bylo pouzito > 2 servery, 
+## tento task by musel byt prepsan?
+#- name: check if {{ corosync_authkey_file }} exists on slave
+#  stat:
+#    path: "{{ corosync_authkey_file }}"
+#  when: (inventory_hostname != master_server)
+#  register: "_corosync_authkey_slave"
+#
 #- name: generate corosync authkey on master server - {{ master_server }}
-#  command: corosync-keygen
+#  command: corosync-keygen -k {{ corosync_authkey_file }}
+#  when: (inventory_hostname == master_server) and
+#        (not _corosync_authkey_master['stat']['exists'])
 #  register: "_corosync_auth_key_generated"
-#  when: >		# TODO - co je tohle za syntaxi?
-#    not _corosync_authkey['stat']['exists'] and
-#    (inventory_hostname == master_server)
 
-## TODO - copy na ostatni stroje
-#- name: copy corosync authkey to all servers
-#  synchronize:
+# ===============================================================
+
+##- name: read corosync authkey file
+##  when: (inventory_hostname == master_server) and
+##       (_corosync_auth_key_generated.changed)
+##  vars:
+##     _corosync_authkey: "{{ lookup('file', {{ corosync_authkey_file }}) }}"
+#
+#- name: configure auth key on slave server
+#  template:
+#    src: "etc/corosync/authkey.j2"
+#    dest: "{{ corosync_authkey_file }}"
+#    owner: "root"
+#    group: "root"
+#    mode: "u=r,g=,o="
+#  when: (inventory_hostname != master_server) and
+#        (not _corosync_authkey_slave['stat']['exists'])
+#  vars:
+#     _corosync_authkey: "{{ lookup('file', '' + corosync_authkey_file|quote ) }}"
+
+# ===============================================================
+
+
+
+## TODO - udelat jako zavislost tasku pro generovani
+#- name: copy corosync authkey to local machine
+#  fetch:
+#    flat: yes
 #    src: "{{ corosync_authkey_file }}"
-#    dest: "rsync://{{ hostname }}/{{ corosync_authkey_file }}"
-#    with_items: groups['all']
-#    loop_control:
-#      loop_var: hostname
-#  when: inventory_hostname == master_server
-#  #notify:	# TODO
-#  #  - restart corosync
-#  #  - restart pacemaker
+#    dest: "/tmp/authkey"
+#  when: (inventory_hostname == master_server) and
+#        (_corosync_auth_key_generated.changed or _corosync_authkey_master['stat']['exists'])
+#        
+### spravna varianta casti podminky
+##(_corosync_auth_key_generated.changed or not _corosync_authkey_slave['stat']['exists'])
+#
+## TODO - udelat jako zavislost tasku pro generovani
+#- name: copy corosync authkey to slave server
+#  copy:
+#    src: "/tmp/authkey"
+#    dest: "{{ corosync_authkey_file }}"
+#  when: (inventory_hostname != master_server) and
+#        (not _corosync_authkey_slave['stat']['exists'])
+#
+## TODO - udelat jako zavislost tasku pro generovani
+#- name: remove corosync authkey
+#  file:
+#    absent: true
+#  when: (inventory_hostname == master_server)
+#  delegate_to: 127.0.0.1
 
 
-# na tohle se vykaslat udelat lokalni fetch a nasledne to nacpat na ostatni
+  #notify:	# TODO
+  #  - restart corosync
+  #  - restart pacemaker
 
 
