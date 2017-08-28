@@ -44,7 +44,6 @@ quorum {
 nodelist{
 {% for host in groups['all'] %}
 		node {
-			ring0_addr: {{ hostvars[host]['inventory_hostname'] }}
 			ring0_addr: {{ hostvars[host].node_ip_addr }}
 		}
 {% endfor %}
