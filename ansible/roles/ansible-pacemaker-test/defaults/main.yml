@@ -1,35 +1,153 @@
+# ============================================================
+# konfiguracni promenne pro corosync a pacemaker
+
 master_server: 'r1nren.et.cesnet.cz'
-#corosync_authkey_file: '/etc/corosync/authkey'	# TODO
-corosync_authkey_file: '/tmp/test'
-corosync_bindnet_interface: 'eth0'
+corosync_authkey_file: '/etc/corosync/authkey'
 corosync_config_file: '/etc/corosync/corosync.conf'
 corosync_expected_votes: 2
 corosync_cluster_name: 'debian'
-corosync_last_man_standing: true
 corosync_transport_proto: 'udpu'
 corosync_crypto_cipher: 'aes256'
-corosync_crypto_hash: 'aes256'
-corosync_wait_for_all: true
+corosync_crypto_hash: 'sha256'
 corosync_two_node: true
+#corosync_last_man_standing: true	# https://www.systutorials.com/docs/linux/man/5-votequorum/
+#corosync_wait_for_all: true		# https://www.systutorials.com/docs/linux/man/5-votequorum/
 pacemaker_disable_stonith: true
-pacemaker_hacluster_password: '64ce38bafdfbb4d6eafa5e40aafbe5a62f73741f01d8770e9fa81aa97fce2d190ef0b57336927a34c12e42ef7505129cbd40a0242dacd560a3754f0f8888074b'
+
+# ============================================================
+# konfigurace clusteru
+
+# ============================================================
+# konfigurace zdroju
 
 pacemaker_cluster_resources:
+
+# standby ip adresa
+# man ocf_heartbeat_IPaddr2
    - resource_id: 'standby_ip'
      action: 'create'
      provider: 'ocf:heartbeat:IPaddr2'
      options:
-       - 'ip=192.168.250.200'
+       - 'ip=78.128.211.53'
+       - 'nic=eth0'
        - 'cidr_netmask=24'
+       # arp_count_refresh
+       # arp_sender
+     meta:				# TODO
+       - 'migration-threshold=1'
+       - 'failure-timeout=300'
      op: 'monitor'
      op_options:
-       - 'interval=30s'
-   - resource_id: 'webserver'
+       - 'interval=60'
+       - 'timeout=300'
+       - 'on-fail=restart'
+
+# TODO - pri zmene parametru bude vytvoren dalsi zdroj nebo budou tomuhle jen zmeneny parametry?
+
+# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/ap-lsb.html
+# http://www.linux-ha.org/wiki/LSB_Resource_Agents
+# ocf_heartbeat_anything
+# ocf-tester
+
+# offline file
+   - resource_id: 'offline_file'	# TODO
      action: 'create'
-     provider: 'ocf:heartbeat:nginx'
-     options:
-       - 'configfile=/etc/nginx/nginx.conf'
+     provider: 'offline_file'
      op: 'monitor'
      op_options:
-       - 'timeout=5s'
-       - 'interval=5s'
+       - 'interval=60'
+       - 'timeout=300'
+       - 'on-fail=restart'
+
+# TODO - not LSB compliant
+## racoon
+#   - resource_id: 'racoon'
+#     action: 'create'
+#     provider: 'racoon'
+#     op: 'monitor'
+#     op_options:
+#       - 'interval=30'
+
+# radiator
+   - resource_id: 'radiator'
+     action: 'create'
+     provider: 'radiator'
+     op: 'monitor'
+     op_options:
+       - 'interval=60'
+       - 'timeout=300'
+       - 'on-fail=restart'
+
+# ============================================================
+# konfigurace omezeni
+
+pacemaker_cluster_constraints: []
+   #- constraint: 'colocation'
+   #  action: 'add'
+   #  source_resource_id: 'webserver'
+   #  target_resource_id: 'virtual_ip'
+   #  score: 'INFINITY'
+   #- constraint: 'order'
+   #  order:
+   #    first_resource: 'virtual_ip'
+   #    first_resource_action: 'start'
+   #    second_resource: 'webserver'
+   #    second_resource_action: 'start'
+
+# ============================================================
+# konfigurace vlastnosti clusteru
+
+pacemaker_cluster_settings:
+   - property: 'stonith-enabled'
+     value: 'no'
+   - property: 'no-quorum-policy'
+     value: 'ignore'
+   - property: 'default-resource-stickiness'
+     value: '100'
+
+   # TODO ?
+   #- property: 'start-failure-is-fatal'
+   #  value: 'false'
+   #- property: 'pe-warn-series-max'
+   #  value: 1000
+   #- property: 'pe-input-series-max'
+   #  value: 1000
+   #- property: 'pe-error-series-max'
+   #  value: 1000
+   #- property: 'cluster-recheck-interval'
+   #  value: 5min
+
+# ============================================================
+# dodatecne poznamky
+#
+# zajimavy agent - https://github.com/ClusterLabs/resource-agents/blob/master/heartbeat/MailTo
+# -> generuje mail pri migraci zdroju
+#
+#
+#
+#
+#
+#
+#
+
+
+# poznamka z clusters from scratch:
+# Do not accept the default network settings. Cluster machines should never obtain an IP address
+# via DHCP, because DHCP’s periodic address renewal will interfere with corosync.
+
+# resource options:
+# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-options.html
+
+
+# zdroje:
+#
+# firewall neni treba jako zdroj
+# ipsec politiky take ne
+#
+# poradi:
+# standby_ip, offline_file, racoon, radiator
+#
+#
+# racoon a radiator muzou byt paralelne
+#
+# pridat ping na gw jako zdroj?
