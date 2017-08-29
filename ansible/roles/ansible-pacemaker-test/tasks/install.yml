@@ -9,3 +9,16 @@
     - 'pacemaker-cli-utils'
     - 'pacemaker-resource-agents'
     - 'pacemaker-common'
+
+- name: copy offline file init script
+  template:
+    src: "etc/init.d/offline_file.j2"
+    dest: "/etc/init.d/offline_file"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+
+- name: enable offline file init script
+  service:
+    name: offline_file
+    enabled: yes

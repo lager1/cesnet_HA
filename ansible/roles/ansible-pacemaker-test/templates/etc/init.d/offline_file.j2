@@ -1,0 +1,116 @@
+#! /bin/sh
+#
+### BEGIN INIT INFO
+# Provides:          offline file
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: offline file daemon
+# Description:       offline file daemon
+### END INIT INFO
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+DESC="offline file daemon"
+OFFLINE_FILE="/etc/OFFLINE"
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+. /lib/lsb/init-functions
+# ========================================================================
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+	# Return
+	#   0 if daemon has been started
+	#   1 if daemon was already running
+	#   2 if daemon could not be started
+	
+	if [ -e $OFFLINE_FILE ]		# file exists
+	then
+	  rm $OFFLINE_FILE		# delete it
+	  
+	  if [ ! -e $OFFLINE_FILE ]	# verify it does not exist now
+	  then
+	    return 2			# file still exists, return 2
+	  fi
+
+	  return 0			# file does not exist
+	fi
+
+  return 1				# file did not exist
+}
+# ========================================================================
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+	# Return
+	#   0 if daemon has been stopped
+	#   1 if daemon was already stopped
+	#   2 if daemon could not be stopped
+	#   other if a failure occurred
+	
+	if [ ! -e $OFFLINE_FILE ]	# file does not exist
+	then
+	  touch $OFFLINE_FILE		# create it
+	  
+	  if [ -e $OFFLINE_FILE ]	# verify it exists now
+	  then
+	    return 2			# file still does not exist, return 2
+	  fi
+
+	  return 0			# file exists
+	fi
+
+  return 1				# file existed
+}
+# ========================================================================
+#
+# Function to get service status
+#
+status()
+{
+	# http://refspecs.linux-foundation.org/LSB_3.2.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+	if [ -e $OFFLINE_FILE ]		# file exists
+	  return 0
+	fi
+
+  return 3	# file does not exist
+}
+# ========================================================================
+case "$1" in
+  start)
+	log_daemon_msg "Starting $DESC"
+	do_start
+	case "$?" in
+		0|1) log_end_msg 0 ;;
+		2) log_end_msg 1 ;;
+	esac
+	;;
+  stop)
+	log_daemon_msg "Stopping $DESC"
+	do_stop
+	case "$?" in
+		0|1) log_end_msg 0 ;;
+		2) log_end_msg 1 ;;
+	esac
+	;;
+  status)
+	status
+	case "$?" in
+		0|1) log_end_msg 0 ;;
+		3) log_end_msg 1 ;;
+	esac
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop|status}" >&2
+	exit 3
+	;;
+esac
+
+:
+
