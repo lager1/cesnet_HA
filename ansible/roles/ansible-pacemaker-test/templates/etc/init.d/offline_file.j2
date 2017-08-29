@@ -76,6 +76,7 @@ status()
 {
 	# http://refspecs.linux-foundation.org/LSB_3.2.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
 	if [ -e $OFFLINE_FILE ]		# file exists
+	then
 	  return 0
 	fi
 
