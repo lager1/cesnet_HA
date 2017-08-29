@@ -22,3 +22,11 @@
   service:
     name: offline_file
     enabled: yes
+
+- name: copy racoon init script
+  template:
+    src: "etc/init.d/racoon.j2"
+    dest: "/etc/init.d/racoon"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"

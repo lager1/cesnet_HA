@@ -1,0 +1,114 @@
+#!/bin/bash
+#
+### BEGIN INIT INFO
+# Provides:          racoon
+# Required-Start:    mountkernfs $local_fs networking
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Start/stop firewalling
+### END INIT INFO
+#
+# 11.  9. 2007 zkontrolovano pred automatickou synchronizaci
+# 29.  4. 2016 zkontrolovano pred nasazenim do ansible
+
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+DESC="offline file daemon"
+
+DAEMON="/usr/sbin/racoon"
+#DAEMON=/usr/local/ipsec-tools-0.6.7/sbin/racoon
+#DAEMON=/usr/local/ipsec-tools-0.7.0/sbin/racoon
+OPTIONS="-f /etc/racoon.conf"
+
+# ================================================================
+# start daemon
+# ================================================================
+start () {
+  echo -n "Starting ipsec daemon: "
+
+  if [ -f /etc/OFFLINE ]
+  then
+    echo "skiped - now in OFFLINE mode.";
+    exit 1;
+  fi
+
+  /sbin/start-stop-daemon --start --exec $DAEMON -- $OPTIONS
+  ret=$?
+
+  if [[ $ret -eq 0 ]]
+  then 
+    echo "racoon.";
+  else 
+    echo "" >/dev/null
+  fi
+
+  exit 0
+};
+# ================================================================
+# stop daemon
+# ================================================================
+stop () {
+  echo -n "Stoping ipsec daemon: racoon"
+
+  E=0;
+
+  while [[ 10 -ge $E ]]
+  do
+    if ps auxww |grep -v grep| grep $DAEMON >/dev/null; then
+
+      if [[ $E -ge 5 ]]
+      then
+        /sbin/start-stop-daemon --stop --signal 9 --exec $DAEMON
+	echo -n "!"
+      else
+        /sbin/start-stop-daemon --stop --exec $DAEMON
+	echo -n "."
+      fi
+      
+      if [[ $E -ge 10 ]]
+      then
+	echo ". FAILED."
+      else
+	sleep 1
+      fi
+
+      E=$[E+1];
+    else
+      E=1000;
+      echo " stoped."
+    fi
+  done
+};
+# ================================================================
+status() {
+
+  if [[ $(ps auxww |grep -v grep| grep $DAEMON | wc -l) -gt 0 ]]
+  then
+    echo "racoon is running"
+    exit 0
+  else
+    echo "racoon is NOT running"
+    exit 3
+  fi 
+}
+# ================================================================
+case "$1" in
+        start)
+                start
+        ;;
+        stop)
+                stop
+        ;;
+	restart)
+		stop
+		start
+	;;
+	status)
+		status
+	;;
+        *)
+        echo "Usage: " `basename $0` "{start|stop|restart|status}"
+esac
+
