@@ -222,6 +222,23 @@ Potom, co cluster detekuje tento stav přemigruje adresu na r2nren.et.cesnet.cz.
 Dostupnost adresy lze taktéž alternativně ověřit dotazem na adresu nren.et.cesnet.cz ve webovém prohlížeči.
 Obsahem zobrazené stránky je jméno serveru, který ji poskytl.
 
+# manuální přepnutí obou strojů
+
+u serveru ve stejne lan se projevi zmena take v pripade pouziti obou zpusobu
+
+## prvni zpusob
+`arpsend -U -c 1 -i 78.128.211.53 -e 78.128.211.1 eth0`
+-> rychlost migrace je instantni, ale je treba nastavit adresu brany jako dst adresu v arpu!
+
+tohle odesle otazku na to jakou MAC adresu pouziva gw se zdrojovou (horkou) IP adresou a MAC adresou
+gw na to odpovi svoji mac adresou a pri tom si updatne cache IP-MAC tak, aby to reflektovalo aktualni stav
+
+## druhy zpusob
+`arping -c 1 -A -b -s 78.128.211.53 -I eth0 78.128.211.53`
+funguje take, je odesilana pouze nevyzadana odpoved s danou IP a MAC, podle me je to lepsi varianta
+tzv gratuitous arp
+
+pozor - arping je z baliku iputils-arping (ne arping!!)
 
 
 # Použité zdroje
