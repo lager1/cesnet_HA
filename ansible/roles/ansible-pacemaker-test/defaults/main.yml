@@ -44,15 +44,11 @@ pacemaker_cluster_resources:
 
 # TODO - pri zmene parametru bude vytvoren dalsi zdroj nebo budou tomuhle jen zmeneny parametry?
 
-# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/ap-lsb.html
-# http://www.linux-ha.org/wiki/LSB_Resource_Agents
-# ocf_heartbeat_anything
-# ocf-tester
-
 # offline file
    - resource_id: 'offline_file'
      action: 'create'
-     provider: 'lsb:offline_file'
+     #provider: 'lsb:offline_file'
+     provider: 'systemd:offline_file'
      meta:
        - 'migration-threshold=1'
        - 'failure-timeout=300'
@@ -65,7 +61,8 @@ pacemaker_cluster_resources:
 # racoon
    - resource_id: 'racoon'
      action: 'create'
-     provider: 'lsb:racoon'
+     #provider: 'lsb:racoon'
+     provider: 'systemd:racoon'
      meta:
        - 'migration-threshold=1'
        - 'failure-timeout=300'
@@ -78,7 +75,8 @@ pacemaker_cluster_resources:
 # radiator
    - resource_id: 'radiator'
      action: 'create'
-     provider: 'lsb:radiator'
+     #provider: 'lsb:radiator'
+     provider: 'systemd:radiator'
      meta:
        - 'migration-threshold=1'
        - 'failure-timeout=300'
