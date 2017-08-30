@@ -137,12 +137,13 @@ pacemaker_cluster_constraints:
      score: '50'
      target_node: '{{ master_server }}'
 
-   #- constraint: 'order'
-   #  order:
-   #    first_resource: 'virtual_ip'
-   #    first_resource_action: 'start'
-   #    second_resource: 'webserver'
-   #    second_resource_action: 'start'
+# poradi zdroju
+   - constraint: 'order'
+     resources:
+       - resource: 'standby_ip'
+       - resource: 'offline_file'
+       - resource: 'racoon'
+       - resource: 'radiator'
 
 # ============================================================
 # konfigurace vlastnosti clusteru
