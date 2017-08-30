@@ -1,5 +1,5 @@
 ---
 - include: install.yml
 - include: corosync.yml
-- include: pacemaker.yml
-#- include: services.yml
+- include: cluster.yml
+  when: inventory_hostname == master_server
