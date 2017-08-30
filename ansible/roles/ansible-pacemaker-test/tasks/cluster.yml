@@ -121,27 +121,19 @@
         item['target_node'] and
         item['score'] not in _pcs_constraint_show['stdout']))
 
-
-#- name: cluster | Cluster order Constraints
-#  command: >
-#           pcs constraint order
-#           {{ item['order']['first_resource_action'] }}
-#           {{ item['order']['first_resource'] }}
-#           then
-#           {% if item['order']['second_resource_action'] is defined %}
-#           {{ item['order']['second_resource_action'] }}
-#           {% endif %}
-#           {{ item['order']['second_resource'] }}
-#           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
-#  with_items: '{{ pacemaker_cluster_constraints }}'
-#  when: >
-#        pacemaker_cluster_constraints is defined and
-#        ((item['constraint']|lower == 'order') and
-#        item['order'] is defined) and
-#        ((item['second_resource_action'] is defined and item['order']['first_resource_action']+" "+item['order']['first_resource']+" then "+item['order']['second_resource_action']+" "+item['order']['second_resource'] not in _pcs_constraint_show['stdout']) or
-#        (item['second_resource_action'] is not defined and item['order']['first_resource_action']+" "+item['order']['first_resource'] and item['order']['second_resource'] not in _pcs_constraint_show['stdout']))
-
-
+- name: cluster | Cluster order Constraints
+  command: >
+           pcs constraint order set
+           {% for res in item['resources'] %}
+           {{ res['resource'] }}
+           {% endfor %}
+  with_items: '{{ pacemaker_cluster_constraints }}'
+  when: >
+        pacemaker_cluster_constraints is defined and
+        item['constraint']|lower == 'order'
+        {% for res in item['resources'] %}
+        and '{{ res['resource'] }}' not in _pcs_constraint_show['stdout']
+        {% endfor %}
 
 # ===================================================
 # ziskani finalniho stavu clusteru a zobrazeni uzivateli
