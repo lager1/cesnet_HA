@@ -20,6 +20,9 @@ pacemaker_disable_stonith: true
 # ============================================================
 # konfigurace zdroju
 
+# manualni smazani konfigurace celeho clusteru
+# # cibadmin -E --force
+
 pacemaker_cluster_resources:
 
 # standby ip adresa
