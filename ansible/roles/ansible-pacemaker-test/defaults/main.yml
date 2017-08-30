@@ -33,7 +33,7 @@ pacemaker_cluster_resources:
        - 'cidr_netmask=24'
        # arp_count_refresh
        # arp_sender
-     meta:				# TODO
+     meta:
        - 'migration-threshold=1'
        - 'failure-timeout=300'
      op: 'monitor'
@@ -50,28 +50,38 @@ pacemaker_cluster_resources:
 # ocf-tester
 
 # offline file
-   - resource_id: 'offline_file'	# TODO
+   - resource_id: 'offline_file'
      action: 'create'
-     provider: 'offline_file'
+     provider: 'lsb:offline_file'
+     meta:
+       - 'migration-threshold=1'
+       - 'failure-timeout=300'
      op: 'monitor'
      op_options:
        - 'interval=60'
        - 'timeout=300'
        - 'on-fail=restart'
 
-# TODO - not LSB compliant
-## racoon
-#   - resource_id: 'racoon'
-#     action: 'create'
-#     provider: 'racoon'
-#     op: 'monitor'
-#     op_options:
-#       - 'interval=30'
+# racoon
+   - resource_id: 'racoon'
+     action: 'create'
+     provider: 'lsb:racoon'
+     meta:
+       - 'migration-threshold=1'
+       - 'failure-timeout=300'
+     op: 'monitor'
+     op_options:
+       - 'interval=60'
+       - 'timeout=300'
+       - 'on-fail=restart'
 
 # radiator
    - resource_id: 'radiator'
      action: 'create'
-     provider: 'radiator'
+     provider: 'lsb:radiator'
+     meta:
+       - 'migration-threshold=1'
+       - 'failure-timeout=300'
      op: 'monitor'
      op_options:
        - 'interval=60'
@@ -81,12 +91,51 @@ pacemaker_cluster_resources:
 # ============================================================
 # konfigurace omezeni
 
-pacemaker_cluster_constraints: []
-   #- constraint: 'colocation'
-   #  action: 'add'
-   #  source_resource_id: 'webserver'
-   #  target_resource_id: 'virtual_ip'
-   #  score: 'INFINITY'
+pacemaker_cluster_constraints:
+
+# zavislosti zdroju
+   - constraint: 'colocation'
+     action: 'add'
+     source_resource_id: 'offline_file'
+     target_resource_id: 'standby_ip'
+     score: 'INFINITY'
+   - constraint: 'colocation'
+     action: 'add'
+     source_resource_id: 'racoon'
+     target_resource_id: 'offline_file'
+     score: 'INFINITY'
+   - constraint: 'colocation'
+     action: 'add'
+     source_resource_id: 'radiator'
+     target_resource_id: 'offline_file'
+     score: 'INFINITY'
+
+# preference zdroju
+   - constraint: 'location'
+     action: 'add'
+     name: 'ip_pref'
+     resource_id: 'standby_ip'
+     score: 50
+     target_node: master_server
+   - constraint: 'location'
+     action: 'add'
+     name: 'offline_file_pref'
+     resource_id: 'offline_file'
+     score: 50
+     target_node: master_server
+   - constraint: 'location'
+     action: 'add'
+     name: 'racoon_pref'
+     resource_id: 'racoon'
+     score: 50
+     target_node: master_server
+   - constraint: 'location'
+     action: 'add'
+     name: 'radiator_pref'
+     resource_id: 'radiator'
+     score: 50
+     target_node: master_server
+
    #- constraint: 'order'
    #  order:
    #    first_resource: 'virtual_ip'
