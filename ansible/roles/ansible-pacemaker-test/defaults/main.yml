@@ -115,26 +115,26 @@ pacemaker_cluster_constraints:
      action: 'add'
      name: 'ip_pref'
      resource_id: 'standby_ip'
-     score: 50
-     target_node: master_server
+     score: '50'
+     target_node: '{{ master_server }}'
    - constraint: 'location'
      action: 'add'
      name: 'offline_file_pref'
      resource_id: 'offline_file'
-     score: 50
-     target_node: master_server
+     score: '50'
+     target_node: '{{ master_server }}'
    - constraint: 'location'
      action: 'add'
      name: 'racoon_pref'
      resource_id: 'racoon'
-     score: 50
-     target_node: master_server
+     score: '50'
+     target_node: '{{ master_server }}'
    - constraint: 'location'
      action: 'add'
      name: 'radiator_pref'
      resource_id: 'radiator'
-     score: 50
-     target_node: master_server
+     score: '50'
+     target_node: '{{ master_server }}'
 
    #- constraint: 'order'
    #  order:
