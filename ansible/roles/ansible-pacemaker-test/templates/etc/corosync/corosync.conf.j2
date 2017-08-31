@@ -43,7 +43,7 @@ quorum {
 }
 
 nodelist{
-{% for host in groups['all'] %}
+{% for host in groups['nren_radius'] %}
 		node {
 			ring0_addr: {{ hostvars[host].node_ip_addr }}
 		}
