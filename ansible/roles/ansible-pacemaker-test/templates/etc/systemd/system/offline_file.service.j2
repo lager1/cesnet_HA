@@ -1,0 +1,13 @@
+[Install]
+WantedBy=multi-user.target
+
+[Unit]
+SourcePath=/usr/local/bin/offline_file.sh
+Description=offline file daemon
+Before=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/offline_file.sh start
+ExecStop=/usr/local/bin/offline_file.sh stop
+RemainAfterExit=yes
