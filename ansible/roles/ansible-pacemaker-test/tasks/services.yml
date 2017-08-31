@@ -31,3 +31,16 @@
   systemd:
     name: racoon
     enabled: yes
+
+- name: copy radiator startup file
+  template:
+    src: "etc/systemd/system/radiator.service.j2"
+    dest: "/etc/systemd/system/radiator.service"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+
+- name: enable radiator systemd service
+  systemd:
+    name: radiator
+    enabled: yes
