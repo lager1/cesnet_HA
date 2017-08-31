@@ -9,24 +9,22 @@
     - 'pacemaker-cli-utils'
     - 'pacemaker-resource-agents'
     - 'pacemaker-common'
+    - 'postfix'         # instalovat i na produkci?
+    - 'mailutils'       # instalovat i na produkci?
 
-- name: copy offline file init script
+# provadet na produkci?
+- name: Set Postfix option type as internet site
+  debconf: name=postfix question="postfix/main_mailer_type" value="'Internet Site'" vtype="string"
+
+# provadet na produkci?
+- name: Set Postfix option hostname
+  debconf: name=postifx question="postfix/mailname" value="{{ inventory_hostname }}" vtype="string"
+
+# from https://github.com/ClusterLabs/pacemaker/blob/master/extra/resources/ping
+- name: copy heartbeat ping agent
   template:
-    src: "etc/init.d/offline_file.j2"
-    dest: "/etc/init.d/offline_file"
-    owner: "root"
-    group: "root"
-    mode: "u=rwx,g=rx,o=rx"
-
-- name: enable offline file init script
-  service:
-    name: offline_file
-    enabled: yes
-
-- name: copy racoon init script
-  template:
-    src: "etc/init.d/racoon.j2"
-    dest: "/etc/init.d/racoon"
+    src: "usr/lib/ocf/resource.d/heartbeat/ping.j2"
+    dest: "/usr/lib/ocf/resource.d/heartbeat/ping"
     owner: "root"
     group: "root"
     mode: "u=rwx,g=rx,o=rx"
