@@ -14,17 +14,20 @@
     group: "root"
     mode: "u=rwx,g=rx,o=rx"
 
-- name: enable offline file systemd service
+- name: enable offline_file systemd service
   systemd:
     name: offline_file
     enabled: yes
 
-# racoon uz je na narodnich radiusech povolen
-#- name: copy racoon startup file
-#  template:
-#    src: "etc/init.d/racoon.j2"
-#    dest: "/etc/init.d/racoon"
-#    owner: "root"
-#    group: "root"
-#    mode: "u=rwx,g=rx,o=rx"
-
+# starup file racoona je vytvoren v /lib/systemd/system/racoon.service pri instalaci
+# podle man racoon je defaultne cteny konfiguracni soubor v /etc/racoon.conf
+# ackoliv /etc/racoon/racoon.conf take existuje
+#
+# parametry pro spusteni racoona pouzite ve startup filu se berou z /etc/racoon/racoon.conf
+# nastaveni konfiguracniho souboru:
+#RACOON_ARGS="-f /etc/racoon/racoon.conf"
+#
+- name: enable racoon systemd service
+  systemd:
+    name: racoon
+    enabled: yes
