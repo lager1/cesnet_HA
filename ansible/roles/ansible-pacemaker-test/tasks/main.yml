@@ -1,4 +1,5 @@
 ---
+- include_vars: defaults/{{ config }}.yml
 - include: install.yml
 - include: services.yml
 - include: corosync.yml

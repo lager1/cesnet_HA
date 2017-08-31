@@ -1,5 +1,5 @@
 ---
 - hosts: all
   roles:
-    - role: ansible-pacemaker-test
-  tasks:
+    - { role: ansible-pacemaker-test, config: testing }
+    #- { role: ansible-pacemaker-test, config: prod }   # TODO
