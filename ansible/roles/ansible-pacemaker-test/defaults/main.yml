@@ -20,13 +20,15 @@ pacemaker_disable_stonith: true
 # ============================================================
 # konfigurace zdroju
 
-# manualni smazani konfigurace celeho clusteru
-# # cibadmin -E --force
+# manualni smazani konfigurace celeho clusteru:
+# cibadmin -E --force
+#
+# pri zmene parametru neni vytvoren novy zdroj s jinymi parametry,
+# ale je nutne ho nejdriv manualne smazat prikazem 'cibadmin -E --force'!
 
 pacemaker_cluster_resources:
 
 # standby ip adresa
-# man ocf_heartbeat_IPaddr2
    - resource_id: 'standby_ip'
      action: 'create'
      provider: 'ocf:heartbeat:IPaddr2'
@@ -34,59 +36,79 @@ pacemaker_cluster_resources:
        - 'ip=78.128.211.53'
        - 'nic=eth0'
        - 'cidr_netmask=24'
-       # arp_count_refresh
-       # arp_sender
      meta:
        - 'migration-threshold=1'
        - 'failure-timeout=300'
      op: 'monitor'
      op_options:
-       - 'interval=60'
+       - 'interval=30'
        - 'timeout=300'
        - 'on-fail=restart'
-
-# TODO - pri zmene parametru bude vytvoren dalsi zdroj nebo budou tomuhle jen zmeneny parametry?
 
 # offline file
    - resource_id: 'offline_file'
      action: 'create'
-     #provider: 'lsb:offline_file'
      provider: 'systemd:offline_file'
      meta:
        - 'migration-threshold=1'
        - 'failure-timeout=300'
      op: 'monitor'
      op_options:
-       - 'interval=60'
+       - 'interval=30'
        - 'timeout=300'
        - 'on-fail=restart'
 
 # racoon
    - resource_id: 'racoon'
      action: 'create'
-     #provider: 'lsb:racoon'
      provider: 'systemd:racoon'
      meta:
        - 'migration-threshold=1'
        - 'failure-timeout=300'
      op: 'monitor'
      op_options:
-       - 'interval=60'
+       - 'interval=30'
        - 'timeout=300'
        - 'on-fail=restart'
 
 # radiator
    - resource_id: 'radiator'
      action: 'create'
-     #provider: 'lsb:radiator'
      provider: 'systemd:radiator'
      meta:
        - 'migration-threshold=1'
        - 'failure-timeout=300'
      op: 'monitor'
      op_options:
-       - 'interval=60'
+       - 'interval=30'
        - 'timeout=300'
+       - 'on-fail=restart'
+
+# mailto
+   - resource_id: 'mailto'
+     action: 'create'
+     provider: 'ocf:heartbeat:MailTo'
+     options:
+        - 'email=machv@cesnet.cz'
+        - 'subject="resource migration"'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'on-fail=restart'
+
+# TODO - tohle nejak nefunguje?
+# TODO - kazdy node by mel mit tento zdroj nezavisle na druhem
+# ping_gw
+   - resource_id: 'ping_gw'
+     action: 'create'
+     provider: 'ocf:heartbeat:ping'
+     options:
+       #- 'name=ping_gw'
+       - 'host_list=78.128.211.1'       # adresa gw
+       #- 'failure_score'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
        - 'on-fail=restart'
 
 # ============================================================
@@ -97,8 +119,13 @@ pacemaker_cluster_constraints:
 # zavislosti zdroju
    - constraint: 'colocation'
      action: 'add'
-     source_resource_id: 'offline_file'
+     source_resource_id: 'ping_gw'
      target_resource_id: 'standby_ip'
+     score: 'INFINITY'
+   - constraint: 'colocation'
+     action: 'add'
+     source_resource_id: 'offline_file'
+     target_resource_id: 'ping_gw'
      score: 'INFINITY'
    - constraint: 'colocation'
      action: 'add'
@@ -110,8 +137,13 @@ pacemaker_cluster_constraints:
      source_resource_id: 'radiator'
      target_resource_id: 'offline_file'
      score: 'INFINITY'
+   - constraint: 'colocation'
+     action: 'add'
+     source_resource_id: 'radiator'
+     target_resource_id: 'offline_file'
+     score: 'INFINITY'
 
-# preference zdroju
+# preference kde maji byt zdroje spusteny
    - constraint: 'location'
      action: 'add'
      name: 'ip_pref'
@@ -136,11 +168,24 @@ pacemaker_cluster_constraints:
      resource_id: 'radiator'
      score: '50'
      target_node: '{{ master_server }}'
+   - constraint: 'location'
+     action: 'add'
+     name: 'ping_gw_pref'
+     resource_id: 'radiator'
+     score: '50'
+     target_node: '{{ master_server }}'
+   - constraint: 'location'
+     action: 'add'
+     name: 'mailto_pref'
+     resource_id: 'mailto'
+     score: '50'
+     target_node: '{{ master_server }}'
 
 # poradi zdroju
    - constraint: 'order'
      resources:
        - resource: 'standby_ip'
+       - resource: 'ping_gw'
        - resource: 'offline_file'
        - resource: 'racoon'
        - resource: 'radiator'
@@ -155,6 +200,9 @@ pacemaker_cluster_settings:
      value: 'ignore'
    - property: 'default-resource-stickiness'
      value: '100'
+
+
+# vsechny zdroje udelat jako systemd nativni sluzby
 
    # TODO ?
    #- property: 'start-failure-is-fatal'
@@ -174,17 +222,9 @@ pacemaker_cluster_settings:
 # zajimavy agent - https://github.com/ClusterLabs/resource-agents/blob/master/heartbeat/MailTo
 # -> generuje mail pri migraci zdroju
 #
+# => pridat
 #
 #
-#
-#
-#
-#
-
-
-# poznamka z clusters from scratch:
-# Do not accept the default network settings. Cluster machines should never obtain an IP address
-# via DHCP, because DHCP’s periodic address renewal will interfere with corosync.
 
 # resource options:
 # http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-options.html
@@ -202,3 +242,18 @@ pacemaker_cluster_settings:
 # racoon a radiator muzou byt paralelne
 #
 # pridat ping na gw jako zdroj?
+# pridat gw, zkusit jak to bude vypadat, kdyz aktivni node vypadne
+# neaktivni by se mel stat masterem, pri obnoveni konektivity by mel masterem zustat
+
+
+# co kdyz bude sluzba restartovana - nebude se stehovat na druhy node?
+# chce to nejake spolehlive reseni
+# udelat nejak ciste pres paramety clusteru -> timery 
+
+
+# simulace dlouheho startu radiatoru -> sleep v konfiguraci
+
+# racoon - upravit tak, aby pouzivalo konfigurak disribuce
+
+# konfiguraci strcit nekam "vys" do hierarchie
+# udelat testovaci a produkcni verzi konfigurace?
