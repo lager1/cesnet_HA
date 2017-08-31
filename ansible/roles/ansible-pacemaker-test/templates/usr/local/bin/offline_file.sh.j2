@@ -32,7 +32,7 @@ do_start()
 	then
 	  rm $OFFLINE_FILE		# delete it
 	  
-	  if [ ! -e $OFFLINE_FILE ]	# verify it does not exist now
+	  if [ -e $OFFLINE_FILE ]	# verify it does not exist now
 	  then
 	    return 2			# file still exists, return 2
 	  fi
@@ -58,7 +58,7 @@ do_stop()
 	then
 	  touch $OFFLINE_FILE		# create it
 	  
-	  if [ -e $OFFLINE_FILE ]	# verify it exists now
+	  if [ ! -e $OFFLINE_FILE ]	# verify it exists now
 	  then
 	    return 2			# file still does not exist, return 2
 	  fi
