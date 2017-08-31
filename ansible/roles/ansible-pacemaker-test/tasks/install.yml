@@ -19,12 +19,3 @@
 # provadet na produkci?
 - name: Set Postfix option hostname
   debconf: name=postifx question="postfix/mailname" value="{{ inventory_hostname }}" vtype="string"
-
-# from https://github.com/ClusterLabs/pacemaker/blob/master/extra/resources/ping
-- name: copy heartbeat ping agent
-  template:
-    src: "usr/lib/ocf/resource.d/heartbeat/ping.j2"
-    dest: "/usr/lib/ocf/resource.d/heartbeat/ping"
-    owner: "root"
-    group: "root"
-    mode: "u=rwx,g=rx,o=rx"
