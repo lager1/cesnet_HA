@@ -1,0 +1,30 @@
+- name: copy offline_file script
+  template:
+    src: "usr/local/bin/offline_file.sh.j2"
+    dest: "/usr/local/bin/offline_file.sh"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+
+- name: copy offline_file startup file
+  template:
+    src: "etc/systemd/system/offline_file.service.j2"
+    dest: "/etc/systemd/system/offline_file.service"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+
+- name: enable offline file systemd service
+  systemd:
+    name: offline_file
+    enabled: yes
+
+# racoon uz je na narodnich radiusech povolen
+#- name: copy racoon startup file
+#  template:
+#    src: "etc/init.d/racoon.j2"
+#    dest: "/etc/init.d/racoon"
+#    owner: "root"
+#    group: "root"
+#    mode: "u=rwx,g=rx,o=rx"
+
