@@ -1,11 +1,9 @@
 # ============================================================
 # konfiguracni promenne pro corosync a pacemaker
 
-master_server: 'r1nren.et.cesnet.cz'
 corosync_authkey_file: '/etc/corosync/authkey'
 corosync_config_file: '/etc/corosync/corosync.conf'
 corosync_expected_votes: 2
-corosync_cluster_name: 'debian'
 corosync_transport_proto: 'udpu'
 corosync_crypto_cipher: 'aes256'
 corosync_crypto_hash: 'sha256'

@@ -1,7 +1,19 @@
 ---
-- include_vars: defaults/{{ config }}.yml
-- include: install.yml
-- include: services.yml
-- include: corosync.yml
-- include: cluster.yml
-  when: inventory_hostname == master_server
+- name: debug
+  debug:
+    #var: '{{ node_ip_addr }}'
+    #msg: "var: {{ corosync_cluster_name }}"
+    msg: "var: {{ master_server }}"
+
+#- name: debug
+#  debug:
+#    var: '{{ pacemaker_cluster_resources }}'
+#- name: debug
+#  debug:
+#    var: '{{ master_server }}'
+
+#- include: install.yml
+#- include: services.yml
+#- include: corosync.yml
+#- include: cluster.yml
+#  when: inventory_hostname == master_server

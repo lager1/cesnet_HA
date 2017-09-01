@@ -1,0 +1,264 @@
+---
+# ============================================================
+# konfiguracni promenne pro corosync a pacemaker
+
+master_server: 'r1nren.et.cesnet.cz'
+corosync_cluster_name: 'debian'
+
+# ============================================================
+# konfigurace clusteru
+
+# ============================================================
+# konfigurace zdroju
+
+# manualni smazani konfigurace celeho clusteru:
+# cibadmin -E --force
+#
+# pri zmene parametru neni vytvoren novy zdroj s jinymi parametry,
+# ale je nutne ho nejdriv manualne smazat prikazem 'cibadmin -E --force'!
+
+pacemaker_cluster_resources:
+
+# standby ip adresa
+   - resource_id: 'standby_ip'
+     action: 'create'
+     provider: 'ocf:heartbeat:IPaddr2'
+     options:
+       - 'ip=78.128.211.53'
+       - 'nic=eth0'
+       - 'cidr_netmask=24'
+     meta:
+       - 'migration-threshold=1'
+       - 'failure-timeout=300'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'timeout=300'
+       - 'on-fail=restart'
+
+# offline file
+   - resource_id: 'offline_file'
+     action: 'create'
+     provider: 'systemd:offline_file'
+     meta:
+       - 'migration-threshold=1'
+       - 'failure-timeout=300'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'timeout=300'
+       - 'on-fail=restart'
+
+# racoon
+   - resource_id: 'racoon'
+     action: 'create'
+     provider: 'systemd:racoon'
+     meta:
+       - 'migration-threshold=1'
+       - 'failure-timeout=300'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'timeout=300'
+       - 'on-fail=restart'
+
+# radiator
+   - resource_id: 'radiator'
+     action: 'create'
+     provider: 'systemd:radiator'
+     meta:
+       - 'migration-threshold=1'
+       - 'failure-timeout=300'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'timeout=300'
+       - 'on-fail=restart'
+
+# TODO - tohle funguje nejak zvlastne
+# mailto
+   - resource_id: 'mailto'
+     action: 'create'
+     provider: 'ocf:heartbeat:MailTo'
+     options:
+        - 'email=machv@cesnet.cz'
+        - 'subject="resource migration"'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'on-fail=restart'
+
+# TODO - tohle nejak nefunguje?
+# ping_gw_n1
+   - resource_id: 'ping_gw_n1'
+     action: 'create'
+     provider: 'ocf:pacemaker:ping'
+     options:
+       #- 'name=ping_gw'                 # TODO?
+       #- 'host_list=78.128.211.1'       # adresa gw
+       - 'host_list=78.128.211.53'       # r2
+       #- 'failure_score'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'on-fail=restart'
+
+# ping_gw_n2
+   - resource_id: 'ping_gw_n2'
+     action: 'create'
+     provider: 'ocf:pacemaker:ping'
+     options:
+       #- 'name=ping_gw'                 # TODO?
+       #- 'host_list=78.128.211.1'       # adresa gw
+       - 'host_list=78.128.211.52'       # r1
+       #- 'failure_score'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'on-fail=restart'
+
+# ============================================================
+# konfigurace omezeni
+
+pacemaker_cluster_constraints:
+
+# zavislosti zdroju
+   - constraint: 'colocation'
+     action: 'add'
+     source_resource_id: 'offline_file'
+     target_resource_id: 'standby_ip'
+     score: 'INFINITY'
+   - constraint: 'colocation'
+     action: 'add'
+     source_resource_id: 'racoon'
+     target_resource_id: 'offline_file'
+     score: 'INFINITY'
+   - constraint: 'colocation'
+     action: 'add'
+     source_resource_id: 'radiator'
+     target_resource_id: 'offline_file'
+     score: 'INFINITY'
+
+# preference kde maji byt zdroje spusteny
+   - constraint: 'location'
+     action: 'add'
+     name: 'ip_pref'
+     resource_id: 'standby_ip'
+     score: '50'
+     target_node: '{{ master_server }}'
+   - constraint: 'location'
+     action: 'add'
+     name: 'offline_file_pref'
+     resource_id: 'offline_file'
+     score: '50'
+     target_node: '{{ master_server }}'
+   - constraint: 'location'
+     action: 'add'
+     name: 'racoon_pref'
+     resource_id: 'racoon'
+     score: '50'
+     target_node: '{{ master_server }}'
+   - constraint: 'location'
+     action: 'add'
+     name: 'radiator_pref'
+     resource_id: 'radiator'
+     score: '50'
+     target_node: '{{ master_server }}'
+   - constraint: 'location'
+     action: 'add'
+     name: 'mailto_pref'
+     resource_id: 'mailto'
+     score: '50'
+     target_node: '{{ master_server }}'
+   - constraint: 'location'
+     action: 'add'
+     name: 'ping_gw_n1_pref'
+     resource_id: 'ping_gw_n1'
+     score: '50'
+     target_node: '{{ master_server }}'
+   - constraint: 'location'
+     action: 'add'
+     name: 'ping_gw_n2_pref'
+     resource_id: 'ping_gw_n2'
+     score: '50'
+     target_node: 'r2nren.et.cesnet.cz'
+
+# poradi zdroju
+   - constraint: 'order'
+     resources:
+       - resource: 'standby_ip'
+       - resource: 'offline_file'
+       - resource: 'racoon'
+       - resource: 'radiator'
+
+# ============================================================
+# konfigurace vlastnosti clusteru
+
+pacemaker_cluster_settings:
+   - property: 'stonith-enabled'
+     value: 'no'
+   - property: 'no-quorum-policy'
+     value: 'ignore'
+   - property: 'default-resource-stickiness'
+     value: '100'
+
+
+   # TODO ?
+   #- property: 'start-failure-is-fatal'
+   #  value: 'false'
+   #- property: 'pe-warn-series-max'
+   #  value: 1000
+   #- property: 'pe-input-series-max'
+   #  value: 1000
+   #- property: 'pe-error-series-max'
+   #  value: 1000
+   #- property: 'cluster-recheck-interval'
+   #  value: 5min
+
+# ============================================================
+# dodatecne poznamky
+#
+# zajimavy agent - https://github.com/ClusterLabs/resource-agents/blob/master/heartbeat/MailTo
+# -> generuje mail pri migraci zdroju
+#
+# => pridat
+#
+#
+
+# resource options:
+# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-options.html
+
+
+# zdroje:
+#
+# firewall neni treba jako zdroj
+# ipsec politiky take ne
+#
+# poradi:
+# standby_ip, offline_file, racoon, radiator
+#
+#
+# racoon a radiator muzou byt paralelne
+#
+# pridat ping na gw jako zdroj?
+# pridat gw, zkusit jak to bude vypadat, kdyz aktivni node vypadne
+# neaktivni by se mel stat masterem, pri obnoveni konektivity by mel masterem zustat
+
+
+# co kdyz bude sluzba restartovana - nebude se stehovat na druhy node?
+# chce to nejake spolehlive reseni
+# udelat nejak ciste pres paramety clusteru -> timery 
+
+# TODO - racoon ma problem nastartovat po nasazeni:
+#
+# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15030]: INFO: @(#)This product linked OpenSSL 1.0.2l  25 May 2017 (http://www.openssl.org/)
+# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15030]: INFO: Reading configuration from "/etc/racoon/racoon.conf"
+# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: racoon.service: PID file /var/run/racoon.pid not readable (yet?) after start: No such file or directory
+# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15032]: INFO: 78.128.211.53[500] used for NAT-T
+# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15032]: ERROR: privsep_bind (Cannot assign requested address) = -1
+# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15032]: [78.128.211.53] ERROR: failed to bind to address 78.128.211.53[500] (Cannot assign requested address).
+# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: racoon.service: Daemon never wrote its PID file. Failing.
+# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: Failed to start Cluster Controlled racoon.
+# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: racoon.service: Unit entered failed state.
+# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: racoon.service: Failed with result 'resources'.
+#

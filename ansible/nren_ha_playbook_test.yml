@@ -1,5 +1,4 @@
 ---
-- hosts: all
+- hosts: nren_radius
   roles:
-    - { role: ansible-pacemaker-test, config: testing }
-    #- { role: ansible-pacemaker-test, config: prod }   # TODO
+    - role: ansible-pacemaker-test
