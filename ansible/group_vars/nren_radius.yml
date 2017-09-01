@@ -3,7 +3,7 @@
 # konfiguracni promenne pro corosync a pacemaker
 
 master_server: 'r1nren.et.cesnet.cz'
-corosync_cluster_name: 'debian'
+corosync_cluster_name: 'eduroam.cz'
 
 # ============================================================
 # konfigurace clusteru
