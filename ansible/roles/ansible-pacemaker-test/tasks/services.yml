@@ -19,14 +19,27 @@
     name: offline_file
     enabled: yes
 
-# starup file racoona je vytvoren v /lib/systemd/system/racoon.service pri instalaci
-# podle man racoon je defaultne cteny konfiguracni soubor v /etc/racoon.conf
-# ackoliv /etc/racoon/racoon.conf take existuje
-#
-# parametry pro spusteni racoona pouzite ve startup filu se berou z /etc/racoon/racoon.conf
+# originalni startup file je v debianu v /lib/systemd/system/racoon.service
+# modifikovano tak, aby systemd vytvoril pid soubor
+- name: copy racoon startup file
+  template:
+    src: "lib/systemd/system/racoon.service.j2"
+    dest: "/lib/systemd/system/racoon.service"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+
+# parametry pro spusteni racoona pouzite ve startup filu se berou z /etc/default/racoon
 # nastaveni konfiguracniho souboru:
 #RACOON_ARGS="-f /etc/racoon/racoon.conf"
-#
+- name: copy racoon default config
+  template:
+    src: "etc/default/racoon.j2"
+    dest: "/etc/default/racoon"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+
 - name: enable racoon systemd service
   systemd:
     name: racoon

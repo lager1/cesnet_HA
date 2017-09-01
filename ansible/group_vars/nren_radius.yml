@@ -249,16 +249,3 @@ pacemaker_cluster_settings:
 # chce to nejake spolehlive reseni
 # udelat nejak ciste pres paramety clusteru -> timery 
 
-# TODO - racoon ma problem nastartovat po nasazeni:
-#
-# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15030]: INFO: @(#)This product linked OpenSSL 1.0.2l  25 May 2017 (http://www.openssl.org/)
-# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15030]: INFO: Reading configuration from "/etc/racoon/racoon.conf"
-# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: racoon.service: PID file /var/run/racoon.pid not readable (yet?) after start: No such file or directory
-# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15032]: INFO: 78.128.211.53[500] used for NAT-T
-# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15032]: ERROR: privsep_bind (Cannot assign requested address) = -1
-# Aug 31 14:26:12 r2nren.et.cesnet.cz racoon[15032]: [78.128.211.53] ERROR: failed to bind to address 78.128.211.53[500] (Cannot assign requested address).
-# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: racoon.service: Daemon never wrote its PID file. Failing.
-# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: Failed to start Cluster Controlled racoon.
-# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: racoon.service: Unit entered failed state.
-# Aug 31 14:26:12 r2nren.et.cesnet.cz systemd[1]: racoon.service: Failed with result 'resources'.
-#
