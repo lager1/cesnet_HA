@@ -14,10 +14,6 @@
     group: "root"
     mode: "u=rwx,g=rx,o=rx"
 
-- name: enable offline_file systemd service
-  systemd:
-    name: offline_file
-    enabled: yes
 
 # originalni startup file je v debianu v /lib/systemd/system/racoon.service
 # modifikovano tak, aby systemd vytvoril pid soubor
@@ -40,11 +36,6 @@
     group: "root"
     mode: "u=rw,g=r,o=r"
 
-- name: enable racoon systemd service
-  systemd:
-    name: racoon
-    enabled: yes
-
 - name: copy radiator startup file
   template:
     src: "etc/systemd/system/radiator.service.j2"
@@ -53,7 +44,20 @@
     group: "root"
     mode: "u=rwx,g=rx,o=rx"
 
-- name: enable radiator systemd service
+# TODO - pridat nejake dalsi sluzby?
+# clusters from scratch: "Services that are intended to be managed via the cluster software should never be managed by the OS."
+
+- name: disable radiator systemd service
   systemd:
     name: radiator
-    enabled: yes
+    enabled: no
+
+- name: disable offline_file systemd service
+  systemd:
+    name: offline_file
+    enabled: no
+
+- name: disable racoon systemd service
+  systemd:
+    name: racoon
+    enabled: no
