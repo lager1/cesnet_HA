@@ -66,6 +66,33 @@
         item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
         item['action']|lower == 'create'
 
+- name: cluster | Creating Cluster Resources for cloning
+  command: >
+           pcs resource create {{ item['resource_id'] }}
+           {{ item['provider'] }} {{ item['options']|join(' ') }}
+           {% if item['op'] is defined %}op {{ item['op'] }}{% endif %}
+           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
+           {% if item['meta'] is defined %}meta {{ item['meta']|join(' ') }}{% endif %}
+  with_items: '{{ pacemaker_cluster_cloned_resources }}'
+  when: >
+        (pacemaker_cluster_cloned_resources is defined) and
+        (item['options'] is defined and
+        (item['resource_id'] not in _pcs_resource_show['stdout'] and
+        item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
+        item['action']|lower == 'clone'
+
+- name: cluster | Cloning Cluster Resources
+  command: >
+           crm configure clone "clone_{{ item['resource_id'] }}" "{{ item['resource_id'] }}"
+           meta globally-unique=false clone-max=2 clone-node-max=1
+  with_items: '{{ pacemaker_cluster_cloned_resources }}'
+  when: >
+        (pacemaker_cluster_cloned_resources is defined) and
+        (item['options'] is defined and
+        (item['resource_id'] not in _pcs_resource_show['stdout'] and
+        item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
+        item['action']|lower == 'clone'
+
 - name: cluster | Creating Cluster Resources without options
   command: >
            pcs resource create {{ item['resource_id'] }}

@@ -16,6 +16,11 @@ corosync_cluster_name: 'eduroam.cz'
 #
 # pri zmene parametru neni vytvoren novy zdroj s jinymi parametry,
 # ale je nutne ho nejdriv manualne smazat prikazem 'cibadmin -E --force'!
+#
+#
+# For example, a setting of migration-threshold=2 and failure-timeout=60s 
+# would cause the resource to move to a new node after 2 failures, 
+# and allow it to move back (depending on stickiness and constraint scores) after one minute.
 
 pacemaker_cluster_resources:
 
@@ -88,28 +93,20 @@ pacemaker_cluster_resources:
        - 'interval=30'
        - 'on-fail=restart'
 
+# klonovane zdroje
+pacemaker_cluster_cloned_resources:
+
 # TODO - pokud to selze, tak .... ?
 # ping_gw_n1
-   - resource_id: 'ping_gw_n1'
-     action: 'create'
+   - resource_id: 'ping_gw'
+     action: 'clone'
      provider: 'ocf:pacemaker:ping'
      options:
        - 'host_list=78.128.211.1'       # adresa gw
      op: 'monitor'
      op_options:
        - 'interval=20'
-       - 'on-fail=restart'
-
-# ping_gw_n2
-   - resource_id: 'ping_gw_n2'
-     action: 'create'
-     provider: 'ocf:pacemaker:ping'
-     options:
-       - 'host_list=78.128.211.1'       # adresa gw
-     op: 'monitor'
-     op_options:
-       - 'interval=20'
-       - 'on-fail=restart'
+       - 'on-fail=standby'
 
 # ============================================================
 # konfigurace omezeni
@@ -165,18 +162,6 @@ pacemaker_cluster_constraints:
      resource_id: 'mailto'
      score: '50'
      target_node: '{{ master_server }}'
-   - constraint: 'location'
-     action: 'add'
-     name: 'ping_gw_n1_pref'
-     resource_id: 'ping_gw_n1'
-     score: 'INFINITY'
-     target_node: '{{ master_server }}'
-   - constraint: 'location'
-     action: 'add'
-     name: 'ping_gw_n2_pref'
-     resource_id: 'ping_gw_n2'
-     score: 'INFINITY'
-     target_node: 'r2nren.et.cesnet.cz'
 
 # poradi zdroju
    - constraint: 'order'
