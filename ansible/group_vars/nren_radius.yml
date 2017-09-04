@@ -88,19 +88,16 @@ pacemaker_cluster_resources:
        - 'interval=30'
        - 'on-fail=restart'
 
-# TODO - tohle nejak nefunguje?
+# TODO - pokud to selze, tak .... ?
 # ping_gw_n1
    - resource_id: 'ping_gw_n1'
      action: 'create'
      provider: 'ocf:pacemaker:ping'
      options:
-       #- 'name=ping_gw'                 # TODO?
-       #- 'host_list=78.128.211.1'       # adresa gw
-       - 'host_list=78.128.211.53'       # r2
-       #- 'failure_score'
+       - 'host_list=78.128.211.1'       # adresa gw
      op: 'monitor'
      op_options:
-       - 'interval=30'
+       - 'interval=20'
        - 'on-fail=restart'
 
 # ping_gw_n2
@@ -108,13 +105,10 @@ pacemaker_cluster_resources:
      action: 'create'
      provider: 'ocf:pacemaker:ping'
      options:
-       #- 'name=ping_gw'                 # TODO?
-       #- 'host_list=78.128.211.1'       # adresa gw
-       - 'host_list=78.128.211.52'       # r1
-       #- 'failure_score'
+       - 'host_list=78.128.211.1'       # adresa gw
      op: 'monitor'
      op_options:
-       - 'interval=30'
+       - 'interval=20'
        - 'on-fail=restart'
 
 # ============================================================
@@ -175,13 +169,13 @@ pacemaker_cluster_constraints:
      action: 'add'
      name: 'ping_gw_n1_pref'
      resource_id: 'ping_gw_n1'
-     score: '150'
+     score: 'INFINITY'
      target_node: '{{ master_server }}'
    - constraint: 'location'
      action: 'add'
      name: 'ping_gw_n2_pref'
      resource_id: 'ping_gw_n2'
-     score: '150'
+     score: 'INFINITY'
      target_node: 'r2nren.et.cesnet.cz'
 
 # poradi zdroju
@@ -194,6 +188,7 @@ pacemaker_cluster_constraints:
 
 # ============================================================
 # konfigurace vlastnosti clusteru
+# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-options.html
 
 pacemaker_cluster_settings:
    - property: 'stonith-enabled'
@@ -203,50 +198,19 @@ pacemaker_cluster_settings:
    - property: 'default-resource-stickiness'
      value: '100'
 
-
-   # TODO ?
-   #- property: 'start-failure-is-fatal'
-   #  value: 'false'
-   #- property: 'pe-warn-series-max'
-   #  value: 1000
-   #- property: 'pe-input-series-max'
-   #  value: 1000
-   #- property: 'pe-error-series-max'
-   #  value: 1000
-   #- property: 'cluster-recheck-interval'
-   #  value: 5min
-
 # ============================================================
 # dodatecne poznamky
 #
 # zajimavy agent - https://github.com/ClusterLabs/resource-agents/blob/master/heartbeat/MailTo
 # -> generuje mail pri migraci zdroju
-#
 # => pridat
 #
-#
 
-# resource options:
-# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-options.html
-
-
-# zdroje:
-#
-# firewall neni treba jako zdroj
-# ipsec politiky take ne
-#
-# poradi:
-# standby_ip, offline_file, racoon, radiator
-#
-#
-# racoon a radiator muzou byt paralelne
-#
 # pridat ping na gw jako zdroj?
 # pridat gw, zkusit jak to bude vypadat, kdyz aktivni node vypadne
 # neaktivni by se mel stat masterem, pri obnoveni konektivity by mel masterem zustat
 
-
-# co kdyz bude sluzba restartovana - nebude se stehovat na druhy node?
+# co kdyz bude sluzba restartovana - nebude se stehovat na druhy node?  - primarne pro radiator !
 # chce to nejake spolehlive reseni
 # udelat nejak ciste pres paramety clusteru -> timery 
 
