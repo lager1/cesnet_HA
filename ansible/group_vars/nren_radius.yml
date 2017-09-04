@@ -188,7 +188,7 @@ pacemaker_cluster_constraints:
 
 # ============================================================
 # konfigurace vlastnosti clusteru
-# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-resource-options.html
+# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/s-cluster-options.html
 
 pacemaker_cluster_settings:
    - property: 'stonith-enabled'
