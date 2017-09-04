@@ -122,7 +122,8 @@ pacemaker_cluster_resources:
 
 pacemaker_cluster_constraints:
 
-# zavislosti zdroju
+# zavislosti zdroju v tom smyslu,
+# ze musi byt spusteny na stejnem nodu clusteru
    - constraint: 'colocation'
      action: 'add'
      source_resource_id: 'offline_file'
@@ -174,13 +175,13 @@ pacemaker_cluster_constraints:
      action: 'add'
      name: 'ping_gw_n1_pref'
      resource_id: 'ping_gw_n1'
-     score: '50'
+     score: '150'
      target_node: '{{ master_server }}'
    - constraint: 'location'
      action: 'add'
      name: 'ping_gw_n2_pref'
      resource_id: 'ping_gw_n2'
-     score: '50'
+     score: '150'
      target_node: 'r2nren.et.cesnet.cz'
 
 # poradi zdroju
