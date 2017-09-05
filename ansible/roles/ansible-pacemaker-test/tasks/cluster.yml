@@ -91,8 +91,6 @@
   command: pcs resource group add {{ pacemaker_group_name }} {{ item['resource_id'] }}
   with_items: '{{ pacemaker_cluster_grouped_resources }}'
 
-# TODO - musi byt explicitni skupina?
-#with_items: '{{ pacemaker_cluster_resources }}'
 #when: ({{ pacemaker_group_name }} not in _pcs_resource_show['stdout'])
 # TODO
 
