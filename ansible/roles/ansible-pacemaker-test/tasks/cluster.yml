@@ -90,9 +90,7 @@
 - name: cluster | Adding all cluster resources to group
   command: pcs resource group add {{ pacemaker_group_name }} {{ item['resource_id'] }}
   with_items: '{{ pacemaker_cluster_grouped_resources }}'
-
-#when: ({{ pacemaker_group_name }} not in _pcs_resource_show['stdout'])
-# TODO
+  when: pacemaker_group_name not in _pcs_resource_show['stdout']
 
 #- name: cluster | Adding Cluster colocation Constraints
 #  command: >
