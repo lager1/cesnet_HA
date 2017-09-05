@@ -66,33 +66,6 @@
         item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
         item['action']|lower == 'create'
 
-- name: cluster | Creating Cluster Resources for cloning
-  command: >
-           pcs resource create {{ item['resource_id'] }}
-           {{ item['provider'] }} {{ item['options']|join(' ') }}
-           {% if item['op'] is defined %}op {{ item['op'] }}{% endif %}
-           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
-           {% if item['meta'] is defined %}meta {{ item['meta']|join(' ') }}{% endif %}
-  with_items: '{{ pacemaker_cluster_cloned_resources }}'
-  when: >
-        (pacemaker_cluster_cloned_resources is defined) and
-        (item['options'] is defined and
-        (item['resource_id'] not in _pcs_resource_show['stdout'] and
-        item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
-        item['action']|lower == 'clone'
-
-- name: cluster | Cloning Cluster Resources
-  command: >
-           crm configure clone "clone_{{ item['resource_id'] }}" "{{ item['resource_id'] }}"
-           meta globally-unique=false clone-max=2 clone-node-max=1
-  with_items: '{{ pacemaker_cluster_cloned_resources }}'
-  when: >
-        (pacemaker_cluster_cloned_resources is defined) and
-        (item['options'] is defined and
-        (item['resource_id'] not in _pcs_resource_show['stdout'] and
-        item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
-        item['action']|lower == 'clone'
-
 - name: cluster | Creating Cluster Resources without options
   command: >
            pcs resource create {{ item['resource_id'] }}
@@ -105,24 +78,42 @@
         (item['resource_id'] not in _pcs_resource_show['stdout']) and
         (item['action']|lower == 'create')
 
-- name: cluster | Adding Cluster colocation Constraints
+- name: cluster | Cloning Cluster Resources
   command: >
-           pcs constraint colocation add
-           {% if item['source_resource_id'] is defined %}
-           {{ item['source_resource_id'] }}
-           {% endif %}
-           {% if item['target_resource_id'] is defined %}
-           {{ item['target_resource_id'] }}
-           {% endif %}
-           {{ item['score']|default('INFINITY') }}
-  with_items: '{{ pacemaker_cluster_constraints }}'
+           crm configure clone "clone_{{ item['resource_id'] }}" "{{ item['resource_id'] }}"
+           meta globally-unique=false clone-max=2 clone-node-max=1
+  with_items: '{{ pacemaker_cluster_cloned_resources }}'
   when: >
-        pacemaker_cluster_constraints is defined and
-        (((item['action'] is defined and
-        item['action']|lower == 'add') and
-        item['constraint']|lower == 'colocation') and
-        (item['source_resource_id'] and
-        item['target_resource_id'] not in _pcs_constraint_show['stdout']))
+        (pacemaker_cluster_cloned_resources is defined)
+        and item['resource_id'] not in _pcs_resource_show['stdout']
+
+- name: cluster | Adding all cluster resources to group
+  command: pcs resource group add {{ pacemaker_group_name }} {{ item['resource_id'] }}
+  with_items: '{{ pacemaker_cluster_grouped_resources }}'
+
+# TODO - musi byt explicitni skupina?
+#with_items: '{{ pacemaker_cluster_resources }}'
+#when: ({{ pacemaker_group_name }} not in _pcs_resource_show['stdout'])
+# TODO
+
+#- name: cluster | Adding Cluster colocation Constraints
+#  command: >
+#           pcs constraint colocation add
+#           {% if item['source_resource_id'] is defined %}
+#           {{ item['source_resource_id'] }}
+#           {% endif %}
+#           {% if item['target_resource_id'] is defined %}
+#           {{ item['target_resource_id'] }}
+#           {% endif %}
+#           {{ item['score']|default('INFINITY') }}
+#  with_items: '{{ pacemaker_cluster_constraints }}'
+#  when: >
+#        pacemaker_cluster_constraints is defined and
+#        (((item['action'] is defined and
+#        item['action']|lower == 'add') and
+#        item['constraint']|lower == 'colocation') and
+#        (item['source_resource_id'] and
+#        item['target_resource_id'] not in _pcs_constraint_show['stdout']))
 
 - name: cluster | Adding Cluster location Constraints
   command: >
@@ -148,19 +139,19 @@
         item['target_node'] and
         item['score'] not in _pcs_constraint_show['stdout']))
 
-- name: cluster | Cluster order Constraints
-  command: >
-           pcs constraint order set
-           {% for res in item['resources'] %}
-           {{ res['resource'] }}
-           {% endfor %}
-  with_items: '{{ pacemaker_cluster_constraints }}'
-  when: >
-        pacemaker_cluster_constraints is defined and
-        item['constraint']|lower == 'order'
-        {% for res in item['resources'] %}
-        and '{{ res['resource'] }}' not in _pcs_constraint_show['stdout']
-        {% endfor %}
+#- name: cluster | Cluster order Constraints
+#  command: >
+#           pcs constraint order set
+#           {% for res in item['resources'] %}
+#           {{ res['resource'] }}
+#           {% endfor %}
+#  with_items: '{{ pacemaker_cluster_constraints }}'
+#  when: >
+#        pacemaker_cluster_constraints is defined and
+#        item['constraint']|lower == 'order'
+#        {% for res in item['resources'] %}
+#        and '{{ res['resource'] }}' not in _pcs_constraint_show['stdout']
+#        {% endfor %}
 
 # ===================================================
 # ziskani finalniho stavu clusteru a zobrazeni uzivateli
