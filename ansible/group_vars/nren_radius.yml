@@ -113,6 +113,7 @@ pacemaker_cluster_grouped_resources:
   - resource_id: 'offline_file'
   - resource_id: 'racoon'
   - resource_id: 'radiator'
+  - resource_id: 'mailto'
 
 # ============================================================
 pacemaker_cluster_constraints:
