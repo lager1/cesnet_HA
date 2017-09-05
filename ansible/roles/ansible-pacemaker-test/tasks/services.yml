@@ -44,7 +44,6 @@
     group: "root"
     mode: "u=rwx,g=rx,o=rx"
 
-# TODO - pridat nejake dalsi sluzby?
 # clusters from scratch: "Services that are intended to be managed via the cluster software should never be managed by the OS."
 
 - name: disable radiator systemd service
