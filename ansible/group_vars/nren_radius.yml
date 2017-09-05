@@ -91,6 +91,18 @@ pacemaker_cluster_resources:
        - 'timeout=30'
        - 'on-fail=restart'
 
+# mailto
+   - resource_id: 'mailto'
+     action: 'create'
+     provider: 'ocf:heartbeat:MailTo'
+     options:
+       - 'email=machv@cesnet.cz'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'timeout=30'
+       - 'on-fail=restart'
+
 # klonovane zdroje
 pacemaker_cluster_cloned_resources:
   - resource_id: 'ping_gw'
