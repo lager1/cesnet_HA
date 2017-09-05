@@ -24,7 +24,6 @@ pacemaker_group_name: 'group_eduroam.cz'
 # and allow it to move back (depending on stickiness and constraint scores) after one minute.
 
 pacemaker_cluster_resources:
-# TODO - pokud to selze, tak .... ?
 # ping_gw
    - resource_id: 'ping_gw'
      action: 'create'
