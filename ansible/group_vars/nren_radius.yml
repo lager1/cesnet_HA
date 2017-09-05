@@ -108,12 +108,22 @@ pacemaker_cluster_constraints:
 # konfigurace omezeni
 
 # poradi ve skupine je dano poradim, ve kterem jsou zdroje definovany
+
+# omezeni kde me skupina primarne bezet
    - constraint: 'location'
      action: 'add'
      name: 'group_pref'
      resource_id: '{{ pacemaker_group_name }}'
      score: '50'
      target_node: '{{ master_server }}'
+
+# omezeni pro pripad, ze uzel nebude mit konektivitu
+   - constraint: 'location'
+     action: 'rule'
+     name: 'no_ping'
+     resource_id: '{{ pacemaker_group_name }}'
+     score: '-INFINITY'
+     rule: 'not_defined pingd or pingd lte 0'
 
 # ============================================================
 # konfigurace vlastnosti clusteru

@@ -135,6 +135,31 @@
         item['target_node'] and
         item['score'] not in _pcs_constraint_show['stdout']))
 
+- name: cluster | Adding Cluster location rules
+  command: >
+           crm configure location
+           {% if item['name'] is defined %}
+           {{ item['name'] }}
+           {% endif %}
+           {% if item['resource_id'] is defined %}
+           {{ item['resource_id'] }}
+           {% endif %}
+           {% if item['action'] is defined %}
+           {{ item['action'] }}
+           {% endif %}
+           {{ item['score']|default('INFINITY') }}:
+           {{ item['rule'] }}
+  with_items: '{{ pacemaker_cluster_constraints }}'
+  when: >
+        pacemaker_cluster_constraints is defined and
+        (((item['action'] is defined and
+        item['action']|lower == 'rule') and
+        item['constraint']|lower == 'location') and
+        (item['resource_id'] and
+        item['name'] and
+        item['rule'] and
+        item['score'] not in _pcs_constraint_show['stdout']))
+
 #- name: cluster | Cluster order Constraints
 #  command: >
 #           pcs constraint order set
