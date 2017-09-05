@@ -4,6 +4,7 @@
 
 master_server: 'r1nren.et.cesnet.cz'
 corosync_cluster_name: 'eduroam.cz'
+pacemaker_group_name: 'group_eduroam.cz'
 
 # ============================================================
 # konfigurace clusteru
@@ -23,6 +24,17 @@ corosync_cluster_name: 'eduroam.cz'
 # and allow it to move back (depending on stickiness and constraint scores) after one minute.
 
 pacemaker_cluster_resources:
+# TODO - pokud to selze, tak .... ?
+# ping_gw
+   - resource_id: 'ping_gw'
+     action: 'create'
+     provider: 'ocf:pacemaker:ping'
+     options:
+       - 'host_list=78.128.211.1'       # adresa gw
+     op: 'monitor'
+     op_options:
+       - 'interval=20'
+       - 'on-fail=standby'
 
 # standby ip adresa
    - resource_id: 'standby_ip'
@@ -80,96 +92,28 @@ pacemaker_cluster_resources:
        - 'timeout=300'
        - 'on-fail=restart'
 
-# TODO - tohle funguje nejak zvlastne
-# mailto
-   - resource_id: 'mailto'
-     action: 'create'
-     provider: 'ocf:heartbeat:MailTo'
-     options:
-        - 'email=machv@cesnet.cz'
-        - 'subject="resource migration"'
-     op: 'monitor'
-     op_options:
-       - 'interval=30'
-       - 'on-fail=restart'
-
 # klonovane zdroje
 pacemaker_cluster_cloned_resources:
+  - resource_id: 'ping_gw'
 
-# TODO - pokud to selze, tak .... ?
-# ping_gw_n1
-   - resource_id: 'ping_gw'
-     action: 'clone'
-     provider: 'ocf:pacemaker:ping'
-     options:
-       - 'host_list=78.128.211.1'       # adresa gw
-     op: 'monitor'
-     op_options:
-       - 'interval=20'
-       - 'on-fail=standby'
+# zdroje ktere maji byt v jedne skupine
+pacemaker_cluster_grouped_resources:
+  - resource_id: 'standby_ip'
+  - resource_id: 'offline_file'
+  - resource_id: 'racoon'
+  - resource_id: 'radiator'
 
 # ============================================================
+pacemaker_cluster_constraints:
 # konfigurace omezeni
 
-pacemaker_cluster_constraints:
-
-# zavislosti zdroju v tom smyslu,
-# ze musi byt spusteny na stejnem nodu clusteru
-   - constraint: 'colocation'
-     action: 'add'
-     source_resource_id: 'offline_file'
-     target_resource_id: 'standby_ip'
-     score: 'INFINITY'
-   - constraint: 'colocation'
-     action: 'add'
-     source_resource_id: 'racoon'
-     target_resource_id: 'offline_file'
-     score: 'INFINITY'
-   - constraint: 'colocation'
-     action: 'add'
-     source_resource_id: 'radiator'
-     target_resource_id: 'offline_file'
-     score: 'INFINITY'
-
-# preference kde maji byt zdroje spusteny
+# poradi ve skupine je dano poradim, ve kterem jsou zdroje definovany
    - constraint: 'location'
      action: 'add'
-     name: 'ip_pref'
-     resource_id: 'standby_ip'
+     name: 'group_pref'
+     resource_id: '{{ pacemaker_group_name }}'
      score: '50'
      target_node: '{{ master_server }}'
-   - constraint: 'location'
-     action: 'add'
-     name: 'offline_file_pref'
-     resource_id: 'offline_file'
-     score: '50'
-     target_node: '{{ master_server }}'
-   - constraint: 'location'
-     action: 'add'
-     name: 'racoon_pref'
-     resource_id: 'racoon'
-     score: '50'
-     target_node: '{{ master_server }}'
-   - constraint: 'location'
-     action: 'add'
-     name: 'radiator_pref'
-     resource_id: 'radiator'
-     score: '50'
-     target_node: '{{ master_server }}'
-   - constraint: 'location'
-     action: 'add'
-     name: 'mailto_pref'
-     resource_id: 'mailto'
-     score: '50'
-     target_node: '{{ master_server }}'
-
-# poradi zdroju
-   - constraint: 'order'
-     resources:
-       - resource: 'standby_ip'
-       - resource: 'offline_file'
-       - resource: 'racoon'
-       - resource: 'radiator'
 
 # ============================================================
 # konfigurace vlastnosti clusteru
