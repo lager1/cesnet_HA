@@ -49,7 +49,7 @@ pacemaker_cluster_resources:
      op: 'monitor'
      op_options:
        - 'interval=30'
-       - 'timeout=300'
+       - 'timeout=30'
        - 'on-fail=restart'
 
 # offline file
@@ -62,7 +62,7 @@ pacemaker_cluster_resources:
      op: 'monitor'
      op_options:
        - 'interval=30'
-       - 'timeout=300'
+       - 'timeout=30'
        - 'on-fail=restart'
 
 # racoon
@@ -75,7 +75,7 @@ pacemaker_cluster_resources:
      op: 'monitor'
      op_options:
        - 'interval=30'
-       - 'timeout=300'
+       - 'timeout=30'
        - 'on-fail=restart'
 
 # radiator
@@ -88,7 +88,7 @@ pacemaker_cluster_resources:
      op: 'monitor'
      op_options:
        - 'interval=30'
-       - 'timeout=300'
+       - 'timeout=30'
        - 'on-fail=restart'
 
 # klonovane zdroje
@@ -142,13 +142,10 @@ pacemaker_cluster_settings:
 # zajimavy agent - https://github.com/ClusterLabs/resource-agents/blob/master/heartbeat/MailTo
 # -> generuje mail pri migraci zdroju
 # => pridat
+# funguje divne - obecne reseni existuje, pridat?
+# https://raymii.org/s/tutorials/Corosync_Pacemaker_-_Execute_a_script_on_failover.html
 #
 
-# pridat ping na gw jako zdroj?
-# pridat gw, zkusit jak to bude vypadat, kdyz aktivni node vypadne
-# neaktivni by se mel stat masterem, pri obnoveni konektivity by mel masterem zustat
-
 # co kdyz bude sluzba restartovana - nebude se stehovat na druhy node?  - primarne pro radiator !
-# chce to nejake spolehlive reseni
-# udelat nejak ciste pres paramety clusteru -> timery 
+# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/_resource_operations.html -> timeout
 
