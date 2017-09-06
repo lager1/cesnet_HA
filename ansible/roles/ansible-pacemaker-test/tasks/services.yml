@@ -1,3 +1,5 @@
+# ===================================================
+# offline_file
 - name: copy offline_file script
   template:
     src: "usr/local/bin/offline_file.sh.j2"
@@ -14,6 +16,8 @@
     group: "root"
     mode: "u=rwx,g=rx,o=rx"
 
+# ===================================================
+# racoon
 
 # originalni startup file je v debianu v /lib/systemd/system/racoon.service
 # modifikovano tak, aby systemd vytvoril pid soubor
@@ -36,6 +40,9 @@
     group: "root"
     mode: "u=rw,g=r,o=r"
 
+# ===================================================
+# radiator
+
 - name: copy radiator startup file
   template:
     src: "etc/systemd/system/radiator.service.j2"
@@ -43,6 +50,28 @@
     owner: "root"
     group: "root"
     mode: "u=rwx,g=rx,o=rx"
+
+# ===================================================
+# eduroam_ping
+
+- name: copy eduroam_ping startup file
+  template:
+    src: "etc/systemd/system/eduroam_ping.service.j2"
+    dest: "/etc/systemd/system/eduroam_ping.service"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+
+- name: copy eduroam_ping script
+  template:
+    src: "usr/local/bin/eduroam_ping.sh.j2"
+    dest: "/usr/local/bin/eduroam_ping.sh"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+
+# ===================================================
+# zakazani managementu sluzeb operacnim systemem
 
 # clusters from scratch: "Services that are intended to be managed via the cluster software should never be managed by the OS."
 
@@ -59,4 +88,10 @@
 - name: disable racoon systemd service
   systemd:
     name: racoon
+    enabled: no
+
+# eduroam_ping neni(nebyl) povolen, ale presto je zakazan
+- name: disable eduroam_ping systemd service
+  systemd:
+    name: eduroam_ping
     enabled: no
