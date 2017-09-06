@@ -150,15 +150,3 @@ pacemaker_cluster_settings:
      value: '100'
 
 # ============================================================
-# dodatecne poznamky
-#
-# zajimavy agent - https://github.com/ClusterLabs/resource-agents/blob/master/heartbeat/MailTo
-# -> generuje mail pri migraci zdroju
-# => pridat
-# funguje divne - obecne reseni existuje, pridat?
-# https://raymii.org/s/tutorials/Corosync_Pacemaker_-_Execute_a_script_on_failover.html
-#
-
-# co kdyz bude sluzba restartovana - nebude se stehovat na druhy node?  - primarne pro radiator !
-# http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/_resource_operations.html -> timeout
-
