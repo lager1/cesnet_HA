@@ -1,0 +1,13 @@
+[Install]
+WantedBy=multi-user.target
+
+[Unit]
+SourcePath=/usr/local/bin/eduroam_ping.sh
+Description=eduroam ping daemon
+Before=multi-user.target
+
+[Service]
+PIDFile=/var/run/eduroam_ping.pid
+Type=forking
+ExecStart=/usr/local/bin/eduroam_ping.sh start
+ExecStop=/usr/local/bin/eduroam_ping.sh stop
