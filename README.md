@@ -23,222 +23,26 @@ Jako operační systém všech serverů byl zvolen debian Stretch.
 
 Oba servery musí mít vzájemnou konektivitu. Taktéž je vhodné, aby měly oba servery vzájemně stejný čas, ideálně jednotný dle ntp.
 
-## Příprava
-
-Pro souběžnou konfiguraci obou serverů je výhodné použít ssh multiplexor.
-Lze použít například *mssh* nebo *csshx*.
-Pokud není expliticně řečeno jinak, předpokládáme v jednotlivých krocích stejnou konfiguraci obou serverů.
-
-K oběma serverům se připojíme pomocí:
-```
-mssh root@r1nren.et.cesnet.cz root@r2nren.et.cesnet.cz
-```  
-
-## Instalace potřebného sw
-Nainstalujeme podpůrné balíky:
-```
-apt-get install pacemaker crmsh corosync pacemaker-cli-utils pacemaker-resource-agents pacemaker-common
-```
 
 
-## Konfigurace clusteru
+# Manuální přepnutí obou strojů
 
-Před samotnou konfigurací cluster je nejprve třeba konfigurovat corosync.
+Přepnutím strojů je myšleno převzetí standby IP adresy zvoleným strojem.
+U serverů ve stejné LAN se projevé změna také v případě použití obou způsobů popsaných níže.
 
-Otevřeme soubor `/etc/corosync/corosync.conf` v našem oblíbeném textovém editoru
-a provedeme následující změny:
-  - změníme `crypto_cipher` parametr z `none` na `aes256`
-  - změníme `crypto_hash` z `none` na `sha256`
-  - změníme `bindnetaddr` na adresu veřejnou adresu serveru:
-    - 78.128.211.51 pro r1nren.et.cesnet.cz
-    - 78.128.211.52 pro r2nren.et.cesnet.cz
-  - zakomentujeme `mcastport`
-  - přidáme `two_node: 1` do quorum-bloku
-  - přidáme `transport: udpu` do totem-bloku
-  - přidáme blok nodelist, kde staticky definujeme IP adresy serverů:
-  ```
-nodelist {
-        node {
-                ring0_addr: 78.128.211.51
-        }
-        node {
-                ring0_addr: 78.128.211.52
-        }
-}
-  ```
-
-Na r1nren.et.cesnet.cz dále spustíme:
-```
-corosync-keygen
-```
-
-Pro generování klíče je nutná dostatečná entropie. Pro generování entropie je možné příkazu dávat vstup z klávesnice.
-
-Vygenerovaný klíč se použije pro zabezpečení komunikace mezi oběma servery. Klíč zkopírujeme na druhý server:
-```
-scp /etc/corosync/authkey root@r2nren.et.cesnet.cz:/etc/corosync/authkey
-```
-
-## Spuštění clusteru
-
-Cluster je nakonfigurován, můžeme spustit corosync a pacemaker:
-```
-service corosync start
-service pacemaker start
-```
-
-Zkontrolujeme stav clusteru:
-```
-crm status
-```
-
-Očekávaný výstup:
-```
-Stack: corosync
-Current DC: r2nren.et.cesnet.cz (version 1.1.15-e174ec8) - partition with quorum
-Last updated: Fri Apr 21 20:59:36 2017      Last change: Fri Apr 21 20:58:55 2017 by hacluster via crmd on r2nren.et.cesnet.cz
-
-2 nodes and 0 resources configured
-
-Online: [ r1nren.et.cesnet.cz r2nren.et.cesnet.cz ]
-
-Full list of resources:
-
-```
-
-
-## Přidání zdrojů
-
-Cluster je spusťen, takže můžeme přidávat zdroje. Zdroje budou mít následující jména:
-- *standby_ip* - standby IP adresa
-- *nginx* - webový server
-
-
-### standby IP
-
-Tuto část konfigurace budeme provádět pouze na jednom serveru. Konfigurace bude automaticky distribuována na oba uzly.
-
-Spustíme crm shell:
-```
-crm configure
-```
-
-Vložíme následující příkazy:
-```
-property stonith-enabled=no
-property no-quorum-policy=ignore
-property default-resource-stickiness=100
-```
-
-Příkaz *no-quorum-policy=ignore* je důležitý, aby mohl cluster nadále bežet i v případě, že bude aktivní pouze jeden server.
-
-Nyní přidáme vlastní zdroje:
-```
-primitive standby_ip ocf:heartbeat:IPaddr2 \
-        params ip="78.128.211.53" nic="eth0" cidr_netmask="24" \
-        meta migration-threshold=1 failure-timeout=300s \
-        op monitor interval=60 timeout=300 on-fail=restart
-primitive nginx ocf:heartbeat:nginx \
-        meta migration-threshold=1 failure-timeout=300s \
-        op monitor interval=60 timeout=300 on-fail=restart
-colocation loc inf: standby_ip nginx
-order ord inf: standby_ip nginx
-location ip_pref standby_ip 50: r1nren.et.cesnet.cz
-location nginx_pref nginx 50: r1nren.et.cesnet.cz
-commit
-```
-
-Ověrímě, že vše proběhlo bez chyby:
-```
-show
-```
-
-Očekávaný výstup:
-```
-node 1317065523: r1nren.et.cesnet.cz
-node 1317065524: r2nren.et.cesnet.cz
-primitive nginx nginx \
-	meta migration-threshold=1 failure-timeout=300s \
-	op monitor interval=60 timeout=300 on-fail=restart
-primitive standby_ip IPaddr2 \
-	params ip=78.128.211.53 nic=eth0 cidr_netmask=24 \
-	meta migration-threshold=1 failure-timeout=300s \
-	op monitor interval=60 timeout=300 on-fail=restart
-location ip_pref standby_ip 50: r1nren.et.cesnet.cz
-colocation loc inf: standby_ip nginx
-location nginx_pref nginx 50: r1nren.et.cesnet.cz
-order ord inf: standby_ip nginx
-property cib-bootstrap-options: \
-	have-watchdog=false \
-	dc-version=1.1.15-e174ec8 \
-	cluster-infrastructure=corosync \
-	cluster-name=debian \
-	stonith-enabled=no \
-	no-quorum-policy=ignore \
-	default-resource-stickiness=100
-```
-
-### Vysvětlivky ke konfiguraci
-
-#### Závislosti
-
-Mezi jednotlivými konfigurovanými primitivy je možné definovat závislosti.
-Závislosti definujeme pomocí direktivy `order`, například:
-```
-order o_foo_before_bar inf: foo bar
-```
-
-Definice závislostí může být povinná (mandatory) nebo doporučená (advisory).
-Zavislosti sami nijak nedefinují to, kde mají být konkrétní primitiva v rámci clusteru umísťena.
-
-
-#### Závislost umístění
-
-Pro specifikaci závislosti umísťení v rámci clusteru se používá direktiva `colocation`.
-
-
-# Simulace výpadku
-
-Ověříme, že migrace adresy funguje správce simulací výpadku r1nren.et.cesnet.cz.
-
-Výpadek serveru na 60 sekund můžeme simulovat například takto:
-```
-service pacemaker stop; service corosync stop; sleep 60; service pacemaker start; service corosync start;
-```
-
-Případně je možné použít alternativu:
-```
-iptables -P INPUT DROP ; sleep 60 ; iptables -P INPUT ACCEPT;
-```
-
-
-V dalším terminálu můžeme spustit ping na adresu nren.et.cesnet.cz:
-```
-ping nren.et.cesnet.cz
-```
-
-Po spuštění simulace výpadku přestane adresa na několik sekund odpovídat.
-Potom, co cluster detekuje tento stav přemigruje adresu na r2nren.et.cesnet.cz.
-Dostupnost adresy lze taktéž alternativně ověřit dotazem na adresu nren.et.cesnet.cz ve webovém prohlížeči.
-Obsahem zobrazené stránky je jméno serveru, který ji poskytl.
-
-# manuální přepnutí obou strojů
-
-u serveru ve stejne lan se projevi zmena take v pripade pouziti obou zpusobu
-
-## prvni zpusob
+## První způsob
 `arpsend -U -c 1 -i 78.128.211.53 -e 78.128.211.1 eth0`
--> rychlost migrace je instantni, ale je treba nastavit adresu brany jako dst adresu v arpu!
+rychlost migrace je instantní, ale je třeba nastavit adresu brány jako cílovou adresu v ARPu!
 
-tohle odesle otazku na to jakou MAC adresu pouziva gw se zdrojovou (horkou) IP adresou a MAC adresou
-gw na to odpovi svoji mac adresou a pri tom si updatne cache IP-MAC tak, aby to reflektovalo aktualni stav
+Tento příkaz odesílá otázku na to, jakou MAC adresu používá brána se zdrojovou (standby) IP adresou a MAC adresou svého rozhraní.
+Brána na to odpoví svojí MAC adresou a při tom si updatuje IP-MAC cache tak, aby to odpovídalo aktuálnímu stavu.
 
-## druhy zpusob
+## Druhý způsob
 `arping -c 1 -A -b -s 78.128.211.53 -I eth0 78.128.211.53`
-funguje take, je odesilana pouze nevyzadana odpoved s danou IP a MAC, podle me je to lepsi varianta
-tzv gratuitous arp
+Tento příkaz funguje také. Je odesílana pouze nevyžádaná odpověď s danou IP a MAC adresou.
+Jde o tzv gratuitous ARP.
 
-pozor - arping je z baliku iputils-arping (ne arping!!)
+Pozor - arping je z balíku iputils-arping, ne arping!!
 
 
 # Použité zdroje
