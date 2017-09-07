@@ -26,6 +26,7 @@ failure_timeout: '300'
 # would cause the resource to move to a new node after 2 failures, 
 # and allow it to move back (depending on stickiness and constraint scores) after one minute.
 
+# definice jednotlivych zdroju
 pacemaker_cluster_resources:
 # ping_gw
    - resource_id: 'ping_gw'
@@ -125,6 +126,7 @@ pacemaker_cluster_cloned_resources:
   - resource_id: 'ping_gw'
 
 # zdroje ktere maji byt v jedne skupine
+# jejich poradi urcuje jejich zavislosti
 pacemaker_cluster_grouped_resources:
   - resource_id: 'standby_ip'
   - resource_id: 'offline_file'
@@ -136,8 +138,6 @@ pacemaker_cluster_grouped_resources:
 # ============================================================
 pacemaker_cluster_constraints:
 # konfigurace omezeni
-
-# poradi ve skupine je dano poradim, ve kterem jsou zdroje definovany
 
 # omezeni kde me skupina primarne bezet
    - constraint: 'location'
