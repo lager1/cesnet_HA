@@ -9,6 +9,9 @@ pacemaker_group_name: 'group_eduroam.cz'
 # ============================================================
 # konfigurace clusteru
 
+migration_threshold: '1'
+failure_timeout: '300'
+
 # ============================================================
 # konfigurace zdroju
 
@@ -44,8 +47,8 @@ pacemaker_cluster_resources:
        - 'nic=eth0'
        - 'cidr_netmask=24'
      meta:
-       - 'migration-threshold=1'
-       - 'failure-timeout=300'
+       - 'migration-threshold="{{ migration_threshold }}"'
+       - 'failure-timeout="{{ failure_timeout }}"'
      op: 'monitor'
      op_options:
        - 'interval=30'
@@ -57,8 +60,8 @@ pacemaker_cluster_resources:
      action: 'create'
      provider: 'systemd:offline_file'
      meta:
-       - 'migration-threshold=1'
-       - 'failure-timeout=300'
+       - 'migration-threshold="{{ migration_threshold }}"'
+       - 'failure-timeout="{{ failure_timeout }}"'
      op: 'monitor'
      op_options:
        - 'interval=30'
@@ -70,8 +73,8 @@ pacemaker_cluster_resources:
      action: 'create'
      provider: 'systemd:racoon'
      meta:
-       - 'migration-threshold=1'
-       - 'failure-timeout=300'
+       - 'migration-threshold="{{ migration_threshold }}"'
+       - 'failure-timeout="{{ failure_timeout }}"'
      op: 'monitor'
      op_options:
        - 'interval=30'
@@ -83,8 +86,21 @@ pacemaker_cluster_resources:
      action: 'create'
      provider: 'systemd:radiator'
      meta:
-       - 'migration-threshold=1'
-       - 'failure-timeout=300'
+       - 'migration-threshold="{{ migration_threshold }}"'
+       - 'failure-timeout="{{ failure_timeout }}"'
+     op: 'monitor'
+     op_options:
+       - 'interval=30'
+       - 'timeout=30'
+       - 'on-fail=restart'
+
+# eduroam_ping
+   - resource_id: 'eduroam_ping'
+     action: 'create'
+     provider: 'systemd:eduroam_ping'
+     meta:
+       - 'migration-threshold="{{ migration_threshold }}"'
+       - 'failure-timeout="{{ failure_timeout }}"'
      op: 'monitor'
      op_options:
        - 'interval=30'
