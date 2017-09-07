@@ -119,6 +119,7 @@ pacemaker_cluster_resources:
        - 'timeout=30'
        - 'on-fail=restart'
 
+
 # klonovane zdroje
 pacemaker_cluster_cloned_resources:
   - resource_id: 'ping_gw'
@@ -129,6 +130,7 @@ pacemaker_cluster_grouped_resources:
   - resource_id: 'offline_file'
   - resource_id: 'racoon'
   - resource_id: 'radiator'
+  - resource_id: 'eduroam_ping'
   - resource_id: 'mailto'
 
 # ============================================================
