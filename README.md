@@ -23,6 +23,38 @@ Jako operační systém všech serverů byl zvolen debian Stretch.
 
 Oba servery musí mít vzájemnou konektivitu. Taktéž je vhodné, aby měly oba servery vzájemně stejný čas, ideálně jednotný dle ntp.
 
+## Spuštění konfigurace pomocí ansible
+
+Konfigurace předpokládá, že oba uzly nemají nakonfigurované žádné zdroje v clusteru.
+V případě, že mají, nebudou prováděny žádné změny.
+Pokud v clusteru existují nějaké zdroje a mají jiné vlastnosti než
+v aktuální ansible konfiguraci, nebudou změny konfigurovány.
+Pro konfiguraci změn je třeba manuálně vymazat konfiguraci clusteru pomocí příkazu:
+```
+cibadmin -E --force
+```
+
+Vlastní konfigurace:
+```
+git clone https://github.com/lager1/cesnet_HA.git
+cd cesnet_HA
+# před spuštením konfigurace se podívejte, zda není třeba vyřešit nějaké TODO!!!
+grep -r TODO *
+# pokud jsou všechna TODO vyřešena, můžeme spusit konfiguraci
+ansible-playbook -i inventory nren_ha_playbook.yml
+```
+
+### Problémy
+
+#### Spuštění služeb na slave (dle konfigurace) uzlu
+
+V případě, že služby běží na slave uzlu a následně je ručne vymazána veškerá konfigurace,
+po nasazení nové konfigurace se cluster pokusí služby sputit na master uzlu,
+ale pravděpodobně z důvodu preferencí jednotlivých zdrojů se mu to nepovede a následkem toho
+jsou všechny služby spušteny na slave uzlu.
+
+Další příčiny tohoto problému nejsou známy.
+
 ## Konfigurace pomocí ansible
 
 Oba toplevel uzly jsou spravovány pomocí ansible. Veškerá konfigurace je umísťena v adresáři ansible.
@@ -42,7 +74,92 @@ ansible
       `-- ansible-pacemaker		- role pro konfiguraci HA
 ```
 
+Veškerá konfigurační logika je realizována pomocí role ansible-pacemaker.
+
+## Popis role ansible-pacemaker
+
+Roli tvoří 4 hlavní tasky, které realizují potřebnou konfiguraci:
+  - install.yml
+  - services.yml
+  - corosync.yml
+  - cluster.yml
+
+### Task install.yml
+
+Task install.yml je zodpovědný za instalaci veškerých potřebných balíků.
+
+TODO
+Task instaluje i balíky postfix a mailutils, které nejsou nezbytné pro práci národního RADIUS
+serveru ani clusteru. Taktéž konfiguruje postfix, což může být v produkčním prostředím nežádoucí.
+
+### Task services.yml
+
+Task services.yml je zodpovědný za vytvoření unit filu všech podpůrných služeb
+a vlastních skriptů, v případě, že jsou potřeba.
+Task dále zodpovídá za to, že všechny clusterované služby NEjsou spravovány operačním systémem
+a všechny cluster spravující jsou spravovány operačním systémem.
+
+### Task corosync.yml
+
+Task corosync.yml je zodpovědný za konfiguraci služby corosync.
+
+### Task cluster.yml
+
+Task cluster.yml je zodpovědný za konfiguraci vlastností, zdrojů a omezení clusteru.
+Veškerá konfigurace tohoto tasku je definována v `ansible/group_vars/nren_radius.yml`.
+
+Konfigurace je mimo jiné komentována v samotném souboru.
+
+#### Důležité poznámky k této konfiguraci
+
+Seznam `pacemaker_cluster_resources` definuje zdroje clusteru.
+Jde tedy o služby, u kterých je je snaha zajistit vysokou dostupnost.
+
+Konfigurační volba  `provider` každého zdroje určuje agenta,
+která bude daný zdroj spravovat.
+Správa zdroje v tomto kontextu znamená spuštení, ukončení a restart.
+Pomocí jména agenta je možné odvodit jméno manuálové stránky,
+například manuálové stránky agenta `'ocf:pacemaker:ping'` je možné prohlížet příkazem `man ocf_pacemaker_ping`.
+
+Všechny možné agenty je možné zobrazit příkazem: `pcs resource agents`.
+Všechny možné providery je možné zobrazit příkazem: `pcs resource providers`.
+
+Položka `options` konkrétního zdroje určuje doplňující volby, se kterými bude agent pracovat.
+Všechny doplňující volby jsou popsány v manuálových stránkách daného agenta.
+
+Položka `meta` konkrétního zdroje určuje jeho dodatečnou konfiguraci nezávisle na agentovi.
+
+Položka `op` konkrétního zdroje určuje akce vykonávané clusterem na agentovi.
+Položka `op_options` definuje dodatečné volby těchto akcí.
+
+
+
+Seznam `pacemaker_cluster_cloned_resources` definuje klonované zdroje clusteru.
+Klonované zdroje jsou takové zdroje, které běhí na každém uzlu clusteru (v případě, že je jich stejný počet).
+
+
+Seznam `pacemaker_cluster_grouped_resources` definuje zdroje clusteru,
+které mají být součástí skupiny.
+Pořadí zdrojů určuje jejich závislosti.
+Druhý definovaný zdroj závisí na prvním, třetí na druhém a podobně.
+Aby mohl být spušten druhý zdroj, musí být aktivní první, dále analogicky.
+Vypínání zdrojů je realizováno pomocí stejného principu pouze s opačným pořadím.
+Clenství všech zdrojů ve skupině zajišťuje spuštení na stejném uzlu clusteru.
+
+Seznam `pacemaker_cluster_constraints` definuje omezení clusteru.
+
+Seznam `pacemaker_cluster_settings:` definuje nastavení celého clusteru.
+
 # Manuální přepnutí obou strojů
+
+TODO
+
+```
+crm node standby
+crm node online
+```
+
+# Manuální přepnutí adresy obou strojů
 
 Přepnutím strojů je myšleno převzetí standby IP adresy zvoleným strojem.
 U serverů ve stejné LAN se projevé změna také v případě použití obou způsobů popsaných níže.
