@@ -150,14 +150,49 @@ Seznam `pacemaker_cluster_constraints` definuje omezení clusteru.
 
 Seznam `pacemaker_cluster_settings:` definuje nastavení celého clusteru.
 
-# Manuální přepnutí obou strojů
+# Užitečné příkazy
+
+Zobrazí aktuální stav clusteru
+```
+crm status
+```
 
 TODO
 
+
+
+
+
+
+
+
+
+
+
+
+# Manuální přepnutí obou strojů
+
+V případě, že potřebujeme přepnout neaktiviní a aktivní uzel
+nebo případně provést na jednom ze serverů nějakou údržbu, zle využít tento přístup.
+
+Na aktivím uzlu spustíme:
+
 ```
 crm node standby
+```
+
+Tento příkaz způsobí, že se tento uzel přesune do standby režimu.
+V standby režimu není dovoleno žádným zdrojům, aby byly na tomto uzlu spuštěny.
+Tím docílíme toho, že z aktivního uzlu budou všechny zdroje přesunuty na jiný uzel.
+
+Na standby ulzu můžeme následně provést požadovanou údržbu.
+Potom spustíme příkaz:
+
+```
 crm node online
 ```
+
+Tento příkaz způsobí, že se tento uzel přesune do online režimu a bude moci opět být hostitelem zdrojů.
 
 # Manuální přepnutí adresy obou strojů
 
