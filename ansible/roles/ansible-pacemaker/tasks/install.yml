@@ -9,8 +9,8 @@
     - 'pacemaker-cli-utils'
     - 'pacemaker-resource-agents'
     - 'pacemaker-common'
-    - 'postfix'         # instalovat i na produkci?
-    - 'mailutils'       # instalovat i na produkci?
+    - 'postfix'         # TODO - instalovat i na produkci?
+    - 'mailutils'       # TODO - instalovat i na produkci?
 
 # provadet na produkci?
 - name: Set Postfix option type as internet site
