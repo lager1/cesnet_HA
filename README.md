@@ -23,7 +23,24 @@ Jako operační systém všech serverů byl zvolen debian Stretch.
 
 Oba servery musí mít vzájemnou konektivitu. Taktéž je vhodné, aby měly oba servery vzájemně stejný čas, ideálně jednotný dle ntp.
 
+## Konfigurace pomocí ansible
 
+Oba toplevel uzly jsou spravovány pomocí ansible. Veškerá konfigurace je umísťena v adresáři ansible.
+Struktura adresáře je následující:
+
+```
+ansible
+  `-- ansible.cfg 			- konfigurace ansible
+   -- group_vars			- konfigurace skupin
+     `-- nren_radius.yml		- konfigurace skupiny nren_radius
+   -- host_vars				- proměnné hostů
+     `-- r1nren.et.cesnet.cz.yml	- konfigurace r1nren.et.cesnet.cz
+      -- r2nren.et.cesnet.cz.yml	- konfigurace r2nren.et.cesnet.cz
+   -- inventory				- definice spravovaných serverů
+   -- nren_ha_playbook.yml		- playbook pro HA
+   -- roles
+      `-- ansible-pacemaker		- role pro konfiguraci HA
+```
 
 # Manuální přepnutí obou strojů
 
