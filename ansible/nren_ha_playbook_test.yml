@@ -1,4 +1,0 @@
----
-- hosts: nren_radius
-  roles:
-    - role: ansible-pacemaker-test
