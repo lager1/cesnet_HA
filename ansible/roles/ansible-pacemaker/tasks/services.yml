@@ -71,7 +71,7 @@
     mode: "u=rwx,g=rx,o=rx"
 
 # ===================================================
-# zakazani managementu sluzeb operacnim systemem
+# zakazani managementu clusterovanych sluzeb operacnim systemem
 
 # clusters from scratch: "Services that are intended to be managed via the cluster software should never be managed by the OS."
 
@@ -95,3 +95,36 @@
   systemd:
     name: eduroam_ping
     enabled: no
+
+# ===================================================
+# preventivni vypnuti vsech sluzeb na slave uzlu
+# tim se zamezi(?) vzniku stavu, kdy bude cela skupina
+# spustena na slave uzlu
+
+# tohle bohuzel neni dostatecne, protoze ostatni "sluzby"
+# zustanou bezet
+# TODO - da se to nejak vyresit?
+
+- name: disable all clustered systemd services
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+  with_items:
+    - 'offline_file'
+    - 'racoon'
+    - 'radiator'
+    - 'eduroam_ping'
+  when: inventory_hostname != master_server
+
+# ===================================================
+# povoleni managementu sluzeb spravucjicich cluster operacnim systemem
+
+- name: enable pacemaker systemd service
+  systemd:
+    name: pacemaker
+    enabled: yes
+
+- name: enable corosync systemd service
+  systemd:
+    name: corosync
+    enabled: yes
