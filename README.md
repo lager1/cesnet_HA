@@ -203,7 +203,7 @@ Zobrazí všechny operace zdrojů. Lze filtrovat na zdroj (-r) nebo uzel (-N).
 crm_resource -O
 ```
 
-Sets up an environment in which configuration tools (cibadmin, crm_resource, etc) work offline instead of against a live cluster,
+Sets up an environment in which configuration tools (cibadmin, crm\_resource, etc) work offline instead of against a live cluster,
 allowing changes to be pre‐viewed and tested for side-effects.
 ```
 crm_shadow
