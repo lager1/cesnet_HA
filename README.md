@@ -192,16 +192,32 @@ Create a tarball containing everything needed when reporting cluster problems.
 crm_report
 ```
 
-TODO
 
+Zobrazí aktuální operace zdrojů. Lze filtrovat na zdroj (-r) nebo uzel (-N).
+```
+crm_resource -O
+```
 
+Zobrazí všechny operace zdrojů. Lze filtrovat na zdroj (-r) nebo uzel (-N).
+```
+crm_resource -O
+```
 
+Sets up an environment in which configuration tools (cibadmin, crm_resource, etc) work offline instead of against a live cluster,
+allowing changes to be pre‐viewed and tested for side-effects.
+```
+crm_shadow
+```
 
+Tool for simulating the cluster's response to events.
+```
+crm_simulate
+```
 
-
-
-
-
+Check, enable or disable standby mode for a cluster node.  Nodes in standby mode may not host cluster resources.
+```
+crm_standby
+```
 
 # Testovací scénáře a jejich výsledky
 
