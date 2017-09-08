@@ -295,5 +295,25 @@ Pozor - arping je z balíku iputils-arping, ne arping!!
   - https://github.com/sbitio/ansible-corosync
 
 
+# TODO
 
+TODO: jak vubec muze takovyhle stav vzniknout?!!
+
+```
+Node r2nren.et.cesnet.cz: standby
+Online: [ r1nren.et.cesnet.cz ]
+
+Full list of resources:
+
+ Clone Set: clone_ping_gw [ping_gw]
+     Started: [ r1nren.et.cesnet.cz ]
+     Stopped: [ r2nren.et.cesnet.cz ]
+ Resource Group: group_eduroam.cz
+     standby_ip	(ocf::heartbeat:IPaddr2):	Started r2nren.et.cesnet.cz
+     offline_file	(systemd:offline_file):	Stopped
+     radiator	(systemd:radiator):	Started r1nren.et.cesnet.cz
+     racoon	(systemd:racoon):	Stopped
+     eduroam_ping	(systemd:eduroam_ping):	Stopped
+     mailto	(ocf::heartbeat:MailTo):	Started r1nren.et.cesnet.cz
+```
 
