@@ -157,6 +157,41 @@ Zobrazí aktuální stav clusteru
 crm status
 ```
 
+Zobrazí aktuální konfiguraci clusteru
+```
+crm configure show
+```
+
+
+Zobrazí aktuální TODO
+```
+crm_simulate -sL
+```
+
+Manuálové stránky příkazu crmsh\_hb\_report.
+Popis příkazu:
+> The crmsh_hb_report(8) is a utility to collect all information (logs, configuration files, system information, etc) relevant to Pacemaker (CRM) over the given period of time.
+
+```
+man crmsh_hb_report
+```
+
+
+Zobrazí aktuální stav clusteru. Přepínače umožňují různé typy výstupů a jednorázové nebo kontinuální sledování stavu.
+```
+crm_mon
+```
+
+Příkaz pro práci s počtem selhání konkrétního zdroje.
+```
+crm_failcount
+```
+
+Create a tarball containing everything needed when reporting cluster problems.
+```
+crm_report
+```
+
 TODO
 
 
