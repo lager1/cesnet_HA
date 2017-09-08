@@ -168,6 +168,9 @@ TODO
 
 
 
+# Testovací scénáře a jejich výsledky
+
+TODO
 
 
 # Manuální přepnutí obou strojů
