@@ -4,3 +4,16 @@
 - include: corosync.yml
 - include: cluster.yml
   when: inventory_hostname == master_server
+
+# ===================================================
+# TODO - je mozne urcit node jako standby pokud jeste
+# neni ani nastaven corosync?
+
+# opetovne uvedeni slave nodu do online modu
+# TODO - melo by byt vycleneno jinde nebo realizovano jako handler
+# zde to moc nedava smysl
+
+- name: set slave node to online mode
+  command: crm node online
+  when: inventory_hostname != master_server
+

@@ -103,7 +103,6 @@
 
 # tohle bohuzel neni dostatecne, protoze ostatni "sluzby"
 # zustanou bezet
-# TODO - da se to nejak vyresit?
 
 - name: disable all clustered systemd services
   systemd:
@@ -114,6 +113,11 @@
     - 'racoon'
     - 'radiator'
     - 'eduroam_ping'
+  when: inventory_hostname != master_server
+
+# dodatecne nastavime slave server do standby modu
+- name: set slave node to standby mode
+  command: crm node standby
   when: inventory_hostname != master_server
 
 # ===================================================
