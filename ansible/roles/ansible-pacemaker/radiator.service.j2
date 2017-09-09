@@ -1,0 +1,50 @@
+# radiator.service
+#
+# Systemd script for Radiator RADIUS Server
+# Copy this script to /lib/systemd/system 
+# and run from console: systemctl enable radiator.service
+#
+# Copy this file to a different name and edit the [Service]
+# variables to run multiple radiusd instances. Make sure
+# PIDFile is different for each instance.
+#
+
+[Unit]
+Description=Radiator
+
+# Make sure your databases and other services required by
+# Radiator are running before radiusd starts
+After=syslog.target
+After=network.target
+After=mariadb.service
+After=postgresql.service
+After=winbind.service
+After=slapd.service
+
+[Service]
+# Note: PIDFile must match Environment's RADIUSD_PIDFILE below.
+#PIDFile=/var/log/radius/radiusd.pid
+PIDFile=/var/run/radiator.pid
+
+# Use RADIATOR_ARGS to add any command line arguments such as name=value
+# global variables or -I for local installation directory
+Environment="RADIATOR_ARGS="
+Environment="RADIATOR_CONFIG=/etc/radiator/radius.cfg" 
+# Command line setting overrides radiusd configuration file setting.
+#Environment="RADIUSD_PIDFILE=/var/log/radius/radiusd.pid"
+
+# Required when radiusd runs as daemon
+Type=forking
+
+# Removes service start rate limiting
+StartLimitInterval=0
+
+# If process dies it will be automatically restarted
+#Restart=always
+
+#ExecStart=/usr/bin/radiusd -daemon -pid_file $RADIUSD_PIDFILE -config_file $RADIATOR_CONFIG $RADIATOR_ARGS 
+ExecStartPre=/usr/bin/test ! -e /etc/OFFLINE
+ExecStart=/usr/bin/radiusd -daemon -config_file $RADIATOR_CONFIG $RADIATOR_ARGS 
+
+[Install]
+WantedBy=multi-user.target
