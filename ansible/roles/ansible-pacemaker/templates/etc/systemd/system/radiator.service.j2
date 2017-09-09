@@ -40,9 +40,10 @@ Type=forking
 StartLimitInterval=0
 
 # If process dies it will be automatically restarted
-Restart=always
+#Restart=always
 
 #ExecStart=/usr/bin/radiusd -daemon -pid_file $RADIUSD_PIDFILE -config_file $RADIATOR_CONFIG $RADIATOR_ARGS 
+ExecStartPre=/usr/bin/test ! -e /etc/OFFLINE
 ExecStart=/usr/bin/radiusd -daemon -config_file $RADIATOR_CONFIG $RADIATOR_ARGS 
 
 [Install]
