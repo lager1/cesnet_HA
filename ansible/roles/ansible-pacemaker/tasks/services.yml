@@ -14,7 +14,7 @@
     dest: "/etc/systemd/system/offline_file.service"
     owner: "root"
     group: "root"
-    mode: "u=rwx,g=rx,o=rx"
+    mode: "u=rw,g=r,o=r"
 
 # ===================================================
 # racoon
@@ -49,7 +49,7 @@
     dest: "/etc/systemd/system/radiator.service"
     owner: "root"
     group: "root"
-    mode: "u=rwx,g=rx,o=rx"
+    mode: "u=rw,g=r,o=r"
 
 # ===================================================
 # eduroam_ping
@@ -60,7 +60,7 @@
     dest: "/etc/systemd/system/eduroam_ping.service"
     owner: "root"
     group: "root"
-    mode: "u=rwx,g=rx,o=rx"
+    mode: "u=rw,g=r,o=r"
 
 - name: copy eduroam_ping script
   template:
