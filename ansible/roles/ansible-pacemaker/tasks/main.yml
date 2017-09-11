@@ -13,6 +13,9 @@
 # TODO - melo by byt vycleneno jinde nebo realizovano jako handler
 # zde to moc nedava smysl
 
+# TODO - co kdyz bude slave node ve standby pred zahajenim konfigurace
+# ma tak zustat nebo prejit do onlinu?
+
 - name: set slave node to online mode
   command: crm node online
   when: inventory_hostname != master_server
