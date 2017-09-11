@@ -162,8 +162,7 @@ Zobrazí aktuální konfiguraci clusteru
 crm configure show
 ```
 
-
-Zobrazí aktuální TODO
+Zobrazí aktuální skóre všech konfigurovaných zdrojů:
 ```
 crm_simulate -sL
 ```
@@ -175,7 +174,6 @@ Popis příkazu:
 ```
 man crmsh_hb_report
 ```
-
 
 Zobrazí aktuální stav clusteru. Přepínače umožňují různé typy výstupů a jednorázové nebo kontinuální sledování stavu.
 ```
@@ -192,7 +190,6 @@ Create a tarball containing everything needed when reporting cluster problems.
 crm_report
 ```
 
-
 Zobrazí aktuální operace zdrojů. Lze filtrovat na zdroj (-r) nebo uzel (-N).
 ```
 crm_resource -O
@@ -200,7 +197,7 @@ crm_resource -O
 
 Zobrazí všechny operace zdrojů. Lze filtrovat na zdroj (-r) nebo uzel (-N).
 ```
-crm_resource -O
+crm_resource -o
 ```
 
 Sets up an environment in which configuration tools (cibadmin, crm\_resource, etc) work offline instead of against a live cluster,
@@ -214,10 +211,16 @@ Tool for simulating the cluster's response to events.
 crm_simulate
 ```
 
-Check, enable or disable standby mode for a cluster node.  Nodes in standby mode may not host cluster resources.
+Přepnutí r2 do standby módu z r1:
 ```
-crm_standby
+root@r1nren:~# crm_standby -v true -N r2nren.et.cesnet.cz
 ```
+
+Přepnutí r2 do online módu z r1:
+```
+root@r1nren:~# crm_standby -v false -N r2nren.et.cesnet.cz
+```
+
 
 # Testovací scénáře a jejich výsledky
 
