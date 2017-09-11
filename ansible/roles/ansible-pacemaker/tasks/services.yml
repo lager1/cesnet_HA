@@ -17,21 +17,6 @@
     mode: "u=rw,g=r,o=r"
 
 # ===================================================
-# racoon
-
-# TODO
-## parametry pro spusteni racoona pouzite ve startup filu se berou z /etc/default/racoon
-## nastaveni konfiguracniho souboru:
-##RACOON_ARGS="-f /etc/racoon/racoon.conf"
-#- name: copy racoon default config
-#  template:
-#    src: "etc/default/racoon.j2"
-#    dest: "/etc/default/racoon"
-#    owner: "root"
-#    group: "root"
-#    mode: "u=rw,g=r,o=r"
-
-# ===================================================
 # radiator
 
 - name: copy radiator startup file
