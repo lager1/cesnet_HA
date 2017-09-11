@@ -9,7 +9,7 @@ pacemaker_group_name: 'group_eduroam.cz'
 # ============================================================
 # konfigurace clusteru
 
-migration_threshold: '1'
+migration_threshold: '2'
 failure_timeout: '300'
 
 # ============================================================
