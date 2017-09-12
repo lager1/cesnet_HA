@@ -303,6 +303,11 @@ Pozor - arping je z balíku iputils-arping, ne arping!!
 
 Pustit cely playbook na "cistych" strojich.
 
+zapokusovat jeste s rozbitym firewallem.
+Pri zapnuti fw na r2 a naslednem zapnuti se zacnout zdroje chovat velmi nepredvidatelne
+(/etc/init.d/firewall\_bad)
+
+
 # TODO 2
 
 TODO: jak vubec muze takovyhle stav vzniknout?!!
