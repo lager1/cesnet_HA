@@ -1,0 +1,23 @@
+# ===================================================
+# preventivni vypnuti vsech sluzeb na slave uzlu
+# tim se zamezi(?) vzniku stavu, kdy bude cela skupina
+# spustena na slave uzlu
+
+# tohle bohuzel neni dostatecne, protoze ostatni "sluzby"
+# zustanou bezet
+
+- name: disable all clustered systemd services
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+  with_items:
+    - 'offline_file'
+    - 'racoon'
+    - 'radiator'
+    - 'eduroam_ping'
+
+# dodatecne nastavime slave server do standby modu
+# toto uz na vyreseni problemu staci
+
+- name: set slave node to standby mode
+  command: crm node standby

@@ -1,0 +1,13 @@
+# ===================================================
+# zjisteni ktery uzel je aktivni a nastaveni jako master server
+
+- name: determine active node
+  stat: path=/etc/OFFLINE
+  register: offline
+  changed_when: False
+
+- name: set master server
+  set_fact:
+    ONLINE: "{{ offline.stat.exists == False }}"
+
+# TODO - co kdyz bude soubor existovat na obou nodech?

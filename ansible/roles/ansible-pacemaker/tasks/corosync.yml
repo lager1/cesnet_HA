@@ -14,9 +14,9 @@
     path: "{{ corosync_authkey_file }}"
   register: "_corosync_authkey"
 
-- name: generate corosync authkey on master server - {{ master_server }}
+- name: generate corosync authkey on master server
   command: corosync-keygen -k {{ corosync_authkey_file }}
-  when: (inventory_hostname == master_server) and
+  when: ONLINE and
         (not _corosync_authkey['stat']['exists'])
   register: "_corosync_authkey_generated"
 
@@ -25,21 +25,21 @@
     flat: yes
     src: "{{ corosync_authkey_file }}"
     dest: "/tmp/authkey"
-  when: (inventory_hostname == master_server) and
+  when: ONLINE and
         (_corosync_authkey_generated.changed)
 
 - name: copy corosync authkey to slave server
   copy:
     src: "/tmp/authkey"
     dest: "{{ corosync_authkey_file }}"
-  when: (inventory_hostname != master_server) and
+  when: ONLINE and
         (not _corosync_authkey['stat']['exists'])
 
 - name: remove corosync authkey
   file:
     path: "/tmp/authkey"
     state: absent
-  when: (inventory_hostname == master_server) and
+  when: ONLINE and
         (_corosync_authkey_generated.changed)
   delegate_to: 127.0.0.1
 

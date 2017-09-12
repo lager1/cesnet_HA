@@ -1,22 +1,16 @@
 ---
+# ===================================================
+# promenna ONLINE znaci master server:
+# ONLINE == True => master
+# ONLINE == False => slave
+
+- include: determine_master.yml
 - include: install.yml
 - include: services.yml
+- include: disable_slave.yml
+  when: not ONLINE
 - include: corosync.yml
 - include: cluster.yml
-  when: inventory_hostname == master_server
-
-# ===================================================
-# TODO - je mozne urcit node jako standby pokud jeste
-# neni ani nastaven corosync?
-
-# opetovne uvedeni slave nodu do online modu
-# TODO - melo by byt vycleneno jinde nebo realizovano jako handler
-# zde to moc nedava smysl
-
-# TODO - co kdyz bude slave node ve standby pred zahajenim konfigurace
-# ma tak zustat nebo prejit do onlinu?
-
-- name: set slave node to online mode
-  command: crm node online
-  when: inventory_hostname != master_server
-
+  when: ONLINE
+- include: enable_slave.yml
+  when: not ONLINE

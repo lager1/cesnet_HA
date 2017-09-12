@@ -1,3 +1,5 @@
+# ===================================================
+# instalace potrebnych baliku
 - name: install necessary packages
   apt:
     name: "{{ item }}"
@@ -9,7 +11,7 @@
     - 'pacemaker-cli-utils'
     - 'pacemaker-resource-agents'
     - 'pacemaker-common'
-#    - 'postfix'         # TODO - instalovat i na produkci? - na prudukci je exim4
+#    - 'postfix'         # na prudukci je manualne instalovany exim4
     - 'mailutils'
 
 # # provadet na produkci?
@@ -19,3 +21,16 @@
 # # provadet na produkci?
 # - name: Set Postfix option hostname
 #   debconf: name=postifx question="postfix/mailname" value="{{ inventory_hostname }}" vtype="string"
+
+# ===================================================
+# povoleni managementu sluzeb spravucjicich cluster operacnim systemem
+
+- name: enable pacemaker systemd service
+  systemd:
+    name: pacemaker
+    enabled: yes
+
+- name: enable corosync systemd service
+  systemd:
+    name: corosync
+    enabled: yes
