@@ -113,7 +113,7 @@ pacemaker_cluster_resources:
      action: 'create'
      provider: 'ocf:heartbeat:MailTo'
      options:
-       - 'email=machv@cesnet.cz'
+       - 'email=machv@cesnet.cz,semik@cesnet.cz'
      op: 'monitor'
      op_options:
        - 'interval=30'
