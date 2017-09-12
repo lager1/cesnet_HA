@@ -41,6 +41,7 @@ cd cesnet_HA
 # před spuštením konfigurace se podívejte, zda není třeba vyřešit nějaké TODO!!!
 grep -r TODO *
 # pokud jsou všechna TODO vyřešena, můžeme spusit konfiguraci
+cd ansible
 ansible-playbook -i inventory nren_ha_playbook.yml
 ```
 
