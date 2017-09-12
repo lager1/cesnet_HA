@@ -1,3 +1,6 @@
+# TODO vsechny soubory bych na produkci instaloval
+# vramci static-config.yml
+
 # ===================================================
 # offline_file
 - name: copy offline_file script
@@ -48,6 +51,7 @@
 
 # ===================================================
 # zakazani managementu clusterovanych sluzeb operacnim systemem
+# TODO: Tohle taky dela na produkci static-config.yml
 
 # clusters from scratch: "Services that are intended to be managed via the cluster software should never be managed by the OS."
 
@@ -72,6 +76,8 @@
     name: eduroam_ping
     enabled: no
 
+# TODO tenhle kousek bych presunul do extra souboru neco jako
+# disable-slave.yml a poustel to primo z main.yml na slave uzel.
 # ===================================================
 # preventivni vypnuti vsech sluzeb na slave uzlu
 # tim se zamezi(?) vzniku stavu, kdy bude cela skupina
@@ -96,6 +102,7 @@
   command: crm node standby
   when: inventory_hostname != master_server
 
+# TODO tohle mi pripada ze by mohlo byt uz v install.yml
 # ===================================================
 # povoleni managementu sluzeb spravucjicich cluster operacnim systemem
 
