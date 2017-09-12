@@ -9,13 +9,13 @@
     - 'pacemaker-cli-utils'
     - 'pacemaker-resource-agents'
     - 'pacemaker-common'
-    - 'postfix'         # TODO - instalovat i na produkci?
+#    - 'postfix'         # TODO - instalovat i na produkci? - na prudukci je exim4
     - 'mailutils'
 
-# provadet na produkci?
-- name: Set Postfix option type as internet site
-  debconf: name=postfix question="postfix/main_mailer_type" value="'Internet Site'" vtype="string"
+# # provadet na produkci?
+# - name: Set Postfix option type as internet site
+#   debconf: name=postfix question="postfix/main_mailer_type" value="'Internet Site'" vtype="string"
 
-# provadet na produkci?
-- name: Set Postfix option hostname
-  debconf: name=postifx question="postfix/mailname" value="{{ inventory_hostname }}" vtype="string"
+# # provadet na produkci?
+# - name: Set Postfix option hostname
+#   debconf: name=postifx question="postfix/mailname" value="{{ inventory_hostname }}" vtype="string"
