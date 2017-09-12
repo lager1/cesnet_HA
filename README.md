@@ -302,8 +302,6 @@ Pozor - arping je z balíku iputils-arping, ne arping!!
 
 Pustit cely playbook na "cistych" strojich.
 
-/etc/default/racoon - jiny na produkci a r1/2
-
 # TODO 2
 
 TODO: jak vubec muze takovyhle stav vzniknout?!!
