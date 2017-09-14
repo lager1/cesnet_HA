@@ -89,10 +89,6 @@ Roli tvoří 4 hlavní tasky, které realizují potřebnou konfiguraci:
 
 Task install.yml je zodpovědný za instalaci veškerých potřebných balíků.
 
-TODO
-Task instaluje i balíky postfix a mailutils, které nejsou nezbytné pro práci národního RADIUS
-serveru ani clusteru. Taktéž konfiguruje postfix, což může být v produkčním prostředím nežádoucí.
-
 ### Task services.yml
 
 Task services.yml je zodpovědný za vytvoření unit filu všech podpůrných služeb
