@@ -307,6 +307,9 @@ zapokusovat jeste s rozbitym firewallem.
 Pri zapnuti fw na r2 a naslednem zapnuti se zacnout zdroje chovat velmi nepredvidatelne
 (/etc/init.d/firewall\_bad)
 
+jak opravdu ciste smazat a vypnout veskere zdroje ?!!
+-> IP adresa!!
+
 
 # TODO 2
 
