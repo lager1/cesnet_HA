@@ -147,6 +147,9 @@ Seznam `pacemaker_cluster_constraints` definuje omezení clusteru.
 
 Seznam `pacemaker_cluster_settings:` definuje nastavení celého clusteru.
 
+Přidání nového zdroje do konfigurace ansiblu a následná konfigurace clusteru bez odebrání veskěré konfigurace clusteru
+přidá nový zdroj do celého clusteru, ale zdroj nebude zařazen ve skupině.
+
 # Užitečné příkazy
 
 Zobrazí aktuální stav clusteru
@@ -164,14 +167,6 @@ Zobrazí aktuální skóre všech konfigurovaných zdrojů:
 crm_simulate -sL
 ```
 
-Manuálové stránky příkazu crmsh\_hb\_report.
-Popis příkazu:
-> The crmsh_hb_report(8) is a utility to collect all information (logs, configuration files, system information, etc) relevant to Pacemaker (CRM) over the given period of time.
-
-```
-man crmsh_hb_report
-```
-
 Zobrazí aktuální stav clusteru. Přepínače umožňují různé typy výstupů a jednorázové nebo kontinuální sledování stavu.
 ```
 crm_mon
@@ -182,11 +177,6 @@ Příkaz pro práci s počtem selhání konkrétního zdroje.
 crm_failcount
 ```
 
-Create a tarball containing everything needed when reporting cluster problems.
-```
-crm_report
-```
-
 Zobrazí aktuální operace zdrojů. Lze filtrovat na zdroj (-r) nebo uzel (-N).
 ```
 crm_resource -O
@@ -195,17 +185,6 @@ crm_resource -O
 Zobrazí všechny operace zdrojů. Lze filtrovat na zdroj (-r) nebo uzel (-N).
 ```
 crm_resource -o
-```
-
-Sets up an environment in which configuration tools (cibadmin, crm\_resource, etc) work offline instead of against a live cluster,
-allowing changes to be pre‐viewed and tested for side-effects.
-```
-crm_shadow
-```
-
-Tool for simulating the cluster's response to events.
-```
-crm_simulate
 ```
 
 Přepnutí r2 do standby módu z r1:
