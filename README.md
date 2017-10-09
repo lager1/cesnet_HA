@@ -200,7 +200,13 @@ root@r1nren:~# crm_standby -v false -N r2nren.et.cesnet.cz
 
 # Testovací scénáře a jejich výsledky
 
-TODO
+## Vypnutí jednoho z uzlů
+
+## Znemožnení komunikace mezi uzly
+
+## Zapnutí služby na neaktivním uzlu
+
+## Výmaz konfigurace a následné vypnutí služby na aktivním uzlu
 
 
 # Manuální přepnutí obou strojů
@@ -277,14 +283,6 @@ Pozor - arping je z balíku iputils-arping, ne arping!!
 # TODO
 
 Pustit cely playbook na "cistych" strojich.
-
-zapokusovat jeste s rozbitym firewallem.
-Pri zapnuti fw na r2 a naslednem zapnuti se zacnout zdroje chovat velmi nepredvidatelne
-(/etc/init.d/firewall\_bad)
-
-jak opravdu ciste smazat a vypnout veskere zdroje ?!!
--> IP adresa!!
-
 
 # TODO 2
 
