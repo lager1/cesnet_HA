@@ -306,12 +306,41 @@ Stejné jako v případě aktivního uzlu.
 
 ## Zapnutí služby na neaktivním uzlu
 
+pro jiné než systemd zdroje lze pomocí:
+
+```
+pcs resource debug-start zdroj
+```
+
 ### standby\_ip
+
+Po přidání zdroje na neaktivní uzel mají oba uzly přidělenou horkou adresu.
+
+Vlastní přidání zdroje nejspíš způsobí, že neaktivní uzel z adresy začne komunikovat
+a komunikace na horkou adresu pak přichází na neaktivní uzel.
+
+Není jasné, proč se celá testovací instance chová takto, není ani jasné, zda by se stejné chování objevilo na fyzickém HW.
+
 ### offline\_file
+
+Přidání zdroje na neaktivním uzlu odebere soubor `/etc/OFFLINE` což je hlavní indikátor pro
+určení master uzlu při nasazování playbooku.
+
+TODO
+
 ### racoon
+
+Spuštění démona způsobí chybu a démon odmítá nastartovat,
+protože nemá k dispozici adresu, ze které potřebuje komunikovat.
+
 ### radiator
+
+Služba je schopna nastartovat, ale neprovádí žádnou komunikaci,
+protože nemá k dispozici horkou adresu.
+
 ### eduroam\_ping
-### mailto
+
+Pokud není zároveň spuštena služba offline\_file služba nenastartuje.
 
 ## Výmaz konfigurace a následné vypnutí služby na aktivním uzlu
 
