@@ -257,6 +257,9 @@ Problém je, že corosync ani pacemaker na "restartovaném" uzlu neběží.
 
 V případě restartu pomocí příkazu reboot k tomu nedojde. V případě, že je použit reboot z webového rozhraní vmware, k problému také nedojde.
 
+Důvodem problémového stavu bylo pravděpodobně všeho dynamické nastavení sítě, které mohlo způsobit race condition mezi DHCP a startem démonů.
+Při převedení na statickou konfiguraci se problém již neobjevuje.
+
 ### Vypnutí neaktivního uzlu
 
 Stejné jako v případě aktivního uzlu, jen nemigruje žádné zdroje.
