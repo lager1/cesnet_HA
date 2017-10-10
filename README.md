@@ -326,7 +326,7 @@ Není jasné, proč se celá testovací instance chová takto, není ani jasné,
 Přidání zdroje na neaktivním uzlu odebere soubor `/etc/OFFLINE` což je hlavní indikátor pro
 určení master uzlu při nasazování playbooku.
 
-TODO
+Následná konfigurace pomocí ansible s parametry `--extra-vars full_config=1` i bez nich projde bez chyb.
 
 ### racoon
 
