@@ -202,9 +202,75 @@ root@r1nren:~# crm_standby -v false -N r2nren.et.cesnet.cz
 
 ## Vypnutí jednoho z uzlů
 
+### Vypnutí aktivního uzlu
+
+Acpi vypnutí postupně vypně všechny zdroje na aktivním uzlu a následně je zapne ne neaktivím.
+Po opětovném zapnutí serveru má v rámci clusteru stav OFFLINE. Stav na "restartovanem" ulzu:
+
+```
+Oct 09 14:15:54 r2nren.et.cesnet.cz systemd[1]: Starting Corosync Cluster Engine...
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [MAIN  ] Corosync Cluster Engine ('2.4.2'): started and ready to provide service.
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [MAIN  ] Corosync built-in features: dbus rdma monitoring watchdog augeas systemd upstart xmlconf qdevices qnetd snm
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [TOTEM ] Initializing transport (UDP/IP Unicast).
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [TOTEM ] Initializing transmit/receive security (NSS) crypto: aes256 hash: sha256
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [TOTEM ] The network interface is down.
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [SERV  ] Service engine loaded: corosync configuration map access [0]
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [QB    ] server name: cmap
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [SERV  ] Service engine loaded: corosync configuration service [1]
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [QB    ] server name: cfg
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [SERV  ] Service engine loaded: corosync cluster closed process group service v1.01 [2]
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [QB    ] server name: cpg
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [SERV  ] Service engine loaded: corosync profile loading service [4]
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [SERV  ] Service engine loaded: corosync resource monitoring service [6]
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [WD    ] No Watchdog /dev/watchdog, try modprobe <a watchdog>
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [WD    ] resource load_15min missing a recovery key.
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [WD    ] resource memory_used missing a recovery key.
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [WD    ] no resources configured.
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [SERV  ] Service engine loaded: corosync watchdog service [7]
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [QUORUM] Using quorum provider corosync_votequorum
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [VOTEQ ] Waiting for all cluster members. Current votes: 1 expected_votes: 2
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [SERV  ] Service engine loaded: corosync vote quorum service v1.0 [5]
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [QB    ] server name: votequorum
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [SERV  ] Service engine loaded: corosync cluster quorum service v0.1 [3]
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [QB    ] server name: quorum
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [TOTEM ] adding new UDPU member {78.128.211.51}
+Oct 09 14:15:55 r2nren.et.cesnet.cz corosync[584]:   [TOTEM ] adding new UDPU member {78.128.211.52}
+Oct 09 14:15:57 r2nren.et.cesnet.cz corosync[584]:   [TOTEM ] The network interface [78.128.211.52] is now up.
+Oct 09 14:15:57 r2nren.et.cesnet.cz corosync[584]:   [TOTEM ] adding new UDPU member {78.128.211.51}
+Oct 09 14:15:57 r2nren.et.cesnet.cz corosync[584]:   [TOTEM ] adding new UDPU member {78.128.211.52}
+Oct 09 14:15:57 r2nren.et.cesnet.cz corosync[584]:   [QB    ] Denied connection, is not ready (584-1411-18)
+Oct 09 14:15:58 r2nren.et.cesnet.cz corosync[584]:   [QB    ] Denied connection, is not ready (584-1411-18)
+Oct 09 14:15:59 r2nren.et.cesnet.cz corosync[584]:   [QB    ] Denied connection, is not ready (584-1411-18)
+Oct 09 14:16:00 r2nren.et.cesnet.cz corosync[584]:   [QB    ] Denied connection, is not ready (584-1411-18)
+Oct 09 14:16:01 r2nren.et.cesnet.cz corosync[584]:   [QB    ] Denied connection, is not ready (584-1411-18)
+Oct 09 14:16:02 r2nren.et.cesnet.cz corosync[584]:   [QB    ] Denied connection, is not ready (584-1411-18)
+Oct 09 14:16:03 r2nren.et.cesnet.cz corosync[584]:   [QB    ] Denied connection, is not ready (584-1411-18)
+Oct 09 14:16:04 r2nren.et.cesnet.cz corosync[584]:   [QB    ] Denied connection, is not ready (584-1411-18)
+Oct 09 14:16:05 r2nren.et.cesnet.cz corosync[584]: corosync: votequorum.c:2065: message_handler_req_exec_votequorum_nodeinfo: Assertion `sender_node != NULL' failed.
+Oct 09 14:16:04 r2nren.et.cesnet.cz systemd[1]: corosync.service: Main process exited, code=killed, status=6/ABRT
+Oct 09 14:16:05 r2nren.et.cesnet.cz systemd[1]: Failed to start Corosync Cluster Engine.
+Oct 09 14:16:05 r2nren.et.cesnet.cz systemd[1]: corosync.service: Unit entered failed state.
+Oct 09 14:16:05 r2nren.et.cesnet.cz systemd[1]: corosync.service: Failed with result 'signal'.
+```
+
+Problém je, že corosync ani pacemaker na "restartovaném" uzlu neběží.
+
+V případě restartu pomocí příkazu reboot k tomu nedojde. V případě, že je použit reboot z webového rozhraní vmware, k problému také nedojde.
+
+### Vypnutí neaktivního uzlu
+
+Stejné jako v případě aktivního uzlu, jen nemigruje žádné zdroje.
+
 ## Znemožnení komunikace mezi uzly
 
 ## Zapnutí služby na neaktivním uzlu
+
+### standby\_ip
+### offline\_file
+### racoon
+### radiator
+### eduroam\_ping
+### mailto
 
 ## Výmaz konfigurace a následné vypnutí služby na aktivním uzlu
 
