@@ -266,6 +266,44 @@ Stejné jako v případě aktivního uzlu, jen nemigruje žádné zdroje.
 
 ## Znemožnení komunikace mezi uzly
 
+### zahazování komunikace pro druhý uzel
+
+r1:
+service firewall stop
+iptables -A INPUT -s 78.128.211.52 -j DROP
+
+r2:
+service firewall stop
+iptables -A INPUT -s 78.128.211.51 -j DROP
+
+#### Spuštění na aktivním uzlu
+
+Po přidání pravidla do firewallu na sebe oba uzly vzájemně nevidí.
+Pasivní uzel usoudí, že aktivní uzel umřel a převezme veškeré služby.
+
+Po vymazání pravidla je detekováno, že služby jsou spuštěny na obou uzlech.
+Služby jsou na obou uzlech vypnuty a spuštěny na nodu s nejvyšší preferencí.
+
+
+Nejvzyšší preferencí je myšleno:
+```
+root@r1nren:~# pcs constraint show --full
+Location Constraints:
+  Resource: group_eduroam.cz
+    Enabled on: r1nren.et.cesnet.cz (score:50) (id:group_pref)
+    Constraint: no_ping
+      Rule: boolean-op=or score=-INFINITY  (id:no_ping-rule)
+        Expression: not_defined pingd  (id:no_ping-rule-expression)
+        Expression: pingd lte 0  (id:no_ping-rule-expression-0)
+Ordering Constraints:
+Colocation Constraints:
+Ticket Constraints:
+```
+
+#### Spuštění na neaktivním uzlu
+
+Stejné jako v případě aktivního uzlu.
+
 ## Zapnutí služby na neaktivním uzlu
 
 ### standby\_ip
