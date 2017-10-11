@@ -260,7 +260,7 @@ V případě restartu pomocí příkazu reboot k tomu nedojde. V případě, že
 Důvodem problémového stavu bylo pravděpodobně všeho dynamické nastavení sítě, které mohlo způsobit race condition mezi DHCP a startem démonů.
 Při převedení na statickou konfiguraci se problém již neobjevuje.
 
-Pokud je vyžadováno dynamické nastavení sítě, je třeba místo parametru `allow-hotplug` použít parametr `auto`.
+Pokud je vyžadováno dynamické nastavení sítě, je třeba místo parametru `allow-hotplug` použít parametr `auto` v `/etc/network/interfaces`.
 
 ### Vypnutí neaktivního uzlu
 
