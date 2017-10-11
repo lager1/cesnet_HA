@@ -284,10 +284,10 @@ Po přidání pravidla do firewallu na sebe oba uzly vzájemně nevidí.
 Pasivní uzel usoudí, že aktivní uzel umřel a převezme veškeré služby.
 
 Po vymazání pravidla je detekováno, že služby jsou spuštěny na obou uzlech.
-Služby jsou na obou uzlech vypnuty a spuštěny na nodu s nejvyšší preferencí.
+Služby jsou na obou uzlech vypnuty a spuštěny na uzlu s nejvyšší preferencí.
 
 
-Nejvzyšší preferencí je myšleno:
+Nejvyšší preferencí je myšleno:
 ```
 root@r1nren:~# pcs constraint show --full
 Location Constraints:
